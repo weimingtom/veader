@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Veader</string>
+	<string name="menu_text_size">Text Size</string>
+	<string name="default_charset">Default Charset</string>
+	<string name="menu_top">Top</string>
+	<string name="menu_charset">Charset</string>
+	<string name="menu_lock">Orientation UnLock</string>
+	<string name="menu_unlock">Orientation Lock</string>
+	<string name="menu_format">Format</string>
+	<string name="menu_sync">Sync SD</string>
+	<string name="menu_brightness">Brightness</string>
+	<string name="menu_sort">Sort</string>
+	<string name="menu_about">About</string>
+	<string name="menu_color">Color</string>
+	<string name="menu_catalog">Catalog</string>
+	<string name="menu_lib">Library</string>
+	<string name="menu_drop_all">Drop All</string>
+		<string name="menu_next5">Next 5 pages</string>
+	<string name="menu_previous5">Previous 5 pages</string>
+	<string name="menu_nextchapter">Next Chapter</string>
+	<string name="menu_previouschapter">Previous Chapter</string>
+	<string name="menu_gotopage">Go to page...</string>
+<string name="menu_delete">Delete</string>
+	<string name="menu_rename">Rename</string>
+	<string name="msg_sync_sd">Search pdb file in sd card...</string>
+	<string name="msg_brightness">Brightness of this book</string>
+	<string name="msg_expired">This app is expired, please upgrade...</string>
+	<string name="msg_store">The book\'s status is saved...</string>
+		<string name="menu_deletelib">Delete Library</string>
+	<string name="msg_need_folder">You need to make an "ebooks" folder in you SD card.
+		\nAnd put your pdb book in the folder.</string>
+
+	<string name="empty_dir">Empty Directory</string>
+	<string name="prev">prev</string>
+	<string name="next">next</string>
+	<string name="parentdir">..(parent directory)</string>
+	<string name="sortby">Sort By...</string>
+	<string name="goto_root">Goto Root</string>
+	<string name="hint_filter">Filter...book or author</string>
+	<string name="text_author">author</string>
+	<string name="text_name">book name</string>
+	<string name="text_checked">Set as my favorite</string>
+	<string name="dialog_edit">Edit book info</string>
+	<string name="dialog_about">About...</string>
+
+		<string name="strBtnGoto">Goto Page</string>
+	
+	  <string name="need_sd">Please insert your SD</string>
+	<string name="choose_color">Which color is your favorite?</string>
+
+	<string name="dbname">reader.db</string>
+	<string name="msg_pageseek">Go to page</string>
+	<string name="hint_text">Enter a name</string>
+	<string name="submitButton">Submit Name</string>
+	<string name="hello">Hello World</string>
+	<string name="library_create">Creating Library</string>
+	<string name="library_nobook">There is no ebook in this folder</string>
+	<string name="library_cannotcreate">Cannot Create Library, folder already been added
+	</string>
+	<string name="library_added">Library successfully added</string>
+	<string name="main_no_items">No orders to display</string>
+</resources>
