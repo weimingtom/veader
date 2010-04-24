@@ -1146,6 +1146,10 @@ return true;
     if(this.lineBuff != ""){
       this.pushLine(pageNo, isV);
     }
+    // if recursive parser, end-page from caller one more time.
+    if(this.recursiveParser){
+      this.textStream.seekPos = this.resumePos;
+    }
     throw "OverflowPage";
   };
 
@@ -1232,13 +1236,20 @@ return true;
       return;
     }
     
+    // if enough space is not lefted for figure size, write it in next page.
+    if ((isV && this.seekWidth + fig.drawWidth + this.layout.yohakuHeight > this.layout.width) ||
+	(!isV && this.seekHeight + fig.drawHeight + this.layout.yohakuHeight > this.layout.height)){
+      this.textStream.seekPos = this.resumePos;
+      throw "OverflowPage";
+    }
+
     // if figure is resized and smaller than half size of original, write it in next page.
     if((fig.drawWidth != fig.width || fig.drawHeight != fig.height) &&
        (fig.drawWidth * 2 < fig.width || fig.drawHeight * 2 < fig.height)){
       this.textStream.seekPos = this.resumePos;
       throw "OverflowPage";
     }
-
+      
     // white space size
     if(isV){
       var restSize = this.layout.height - fig.drawHeight - this.layout.fontSize;
@@ -1660,7 +1671,7 @@ return true;
   StreamParser.prototype.outputHalfWord = function(){
     if(this.halfBuff.lenght == 1){
       var ret = this.applyTagStack(this.halfBuff, true);
-    } else if(this.halfBuff.length <= 2 && !this.halfWordBreak && (this.halfBuff.match(/\d+/) || this.halfBuff.match(/[!\?]+/))){
+    } else if(this.halfBuff.length == 2 && !this.halfWordBreak && (this.halfBuff.match(/\d+/) || this.halfBuff.match(/[!\?]+/))){
       var ret = this.applyTagStack(this.halfBuff, true);
     } else if (Env.isIE){
       var css = this.inlineCss({
