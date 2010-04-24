@@ -28,7 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -143,42 +143,7 @@ public class DirectoryBrowser extends ListActivity {
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
-	protected void fnInitDB() {
-		try {
-			SQLiteDatabase myDB = null;
-
-			myDB = this.openOrCreateDatabase(dbname, MODE_PRIVATE, null);
-
-			dbpath = "/sdcard/reader/";
-
-			dblocation = dbpath + dbname;
-			myDB.beginTransaction();
-			myDB
-					.execSQL("CREATE TABLE IF NOT EXISTS catalog (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-							+ "path varchar, name varchar, description varchar, catagoryid varchar);");
-
-			myDB
-					.execSQL("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-							+ "path varchar, description varchar, title varchar, size INT, pagecount int, authorid int, catalogid INT);");
-			myDB
-					.execSQL("CREATE TABLE IF NOT EXISTS author (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-							+ "name varchar, description varchar,  dob date, dod date);");
-			myDB
-					.execSQL("CREATE TABLE IF NOT EXISTS bookmark (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-							+ "name varchar, description varchar, bookid INT, pages int, dob date, dod date);");
-			myDB.setTransactionSuccessful();
-			myDB.endTransaction();
-			this.copyfile("/data/data/com.android.lee.pdbreader/databases/"
-					+ dbname, dblocation);
-
-		} catch (SQLiteException e) {
-
-			TextView textCurrentFolder = (TextView) findViewById(R.id.currentfolder);
-			textCurrentFolder.setText(e.getMessage());
-
-		}
-
-	}
+	
 
 	private void InsertLibrary(final String... args) {
 
@@ -286,7 +251,7 @@ public class DirectoryBrowser extends ListActivity {
 			if (_file.isDirectory()) {
 				String parentPath = (_file.getParent() == null) ? "" : _file
 						.getParent();
-				// String s = "123abc456AbC789";
+			
 				_lib2.setname(getString(R.string.parentdir));
 				_lib2.setpath(parentPath);
 				_library.add(_lib2);
@@ -370,92 +335,17 @@ public class DirectoryBrowser extends ListActivity {
 		} else {
 			this.selectedLib = _library.get(selectedRow);
 			final File file = new File(_library.get(selectedRow).getpath());
-			// new AlertDialog.Builder(this)
-			// .setTitle("Ãö©ó Android BMI")
-			// .setMessage(_library.get(selectedRow).getpath())
-			// .show();
+			
 			if (file.isDirectory()) {
 
 				listDir(file);
 
 			} else {
-				// new AlertDialog.Builder(FileList.this)
-				// .setTitle("This file is not a directory")
-				// .setNeutralButton("OK", new
-				// DialogInterface.OnClickListener(){
-				// public void onClick(DialogInterface dialog, int button){
-				// //do nothing
-				// }
-				// })
-				// .show();
+			
 			}
 		}
 	}
 
-	/*private class InsertDataTask extends AsyncTask<String, Void, Void> {
-		private final ProgressDialog dialog = new ProgressDialog(
-				DirectoryBrowser.this);
-		private String msg;
-		boolean executeStatus;
-
-		// can use UI thread here
-		protected void onPreExecute() {
-			this.dialog.setMessage("Creating library...");
-			this.dialog.show();
-		}
-
-		// automatically done on worker thread (separate from UI thread)
-		protected Void doInBackground(final String... args) {
-			String path = args[0];
-			if (this.dialog.isShowing())
-				this.dialog.dismiss();
-			this.dialog.setMessage(args[0]);
-			try {
-				boolean _pathExists = DirectoryBrowser.this.application
-						.getDataHelper().pathExists(path);
-				String xx = (_pathExists) ? "true" : "false";
-				this.dialog.setMessage(xx);
-				if (!_pathExists) {
-					// this.dialog.setMessage("Creating New");
-					DirectoryBrowser.this.application.getDataHelper()
-							.insertLibrary(args[0], args[1], "");
-				} else {
-
-					msg = DirectoryBrowser.this.getResources().getString(
-							R.string.library_cannotcreate).toString();
-					executeStatus = false;
-
-				}
-
-				
-				 * else{ new AlertDialog.Builder(DirectoryBrowser.this)
-				 * .setTitle("already added") .setNeutralButton("OK", new
-				 * DialogInterface.OnClickListener(){ public void
-				 * onClick(DialogInterface dialog, int button){
-				 * 
-				 * } }) .show();}
-				 
-
-			} catch (Exception e) {
-				this.dialog.setMessage(e.getMessage());
-
-			}
-			return null;
-		}
-
-		// can use UI thread here
-		protected void onPostExecute(final Void unused) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
-			// reset the output view by retrieving the new data
-			// (note, this is a naive example, in the real world it might make
-			// sense
-			// to have a cache of the data and just append to what is already
-			// there, or such
-			// in order to cut down on expensive database operations)
-			// new SelectDataTask().execute();
-		}
-	}*/
+	
 
 }

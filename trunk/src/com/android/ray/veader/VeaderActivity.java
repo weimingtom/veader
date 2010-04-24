@@ -103,7 +103,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			}
 			// paramTxt = this.wrap(paramTxt, 27, null, true);
 		//	Log.d("settextactivity", paramTxt);
-			VeaderActivity.this.settext(args[0]);
+			VeaderActivity.this.settext(args[0], pos);
 
 			return "";
 		}
@@ -430,6 +430,8 @@ VeaderActivity.this.mWebView.loadUrl(jsCmd);
 	private TextView txtbottomleft, txtbottomright, txtbottomcenter;
 	private Handler mHandler = new Handler();
 	long currentChapter, pageno;
+	long bookid;
+	float fltPercent;
 	// private GestureDetector gestureScanner;
 	protected static final String TAG = "PilotBookReaderActivity";
 	private static final int MAX_TEXT_SIZE = 36;
@@ -445,7 +447,7 @@ private ZoomControls zoomControl;
 	private GestureDetector gestureDetector;
 
 	View.OnTouchListener gestureListener;
-
+private int paramPage;
 	private Handler pHandler;
 
 	private int totalPage;
@@ -509,16 +511,20 @@ private ZoomControls zoomControl;
 					mBook.nextPage();
 					final CharSequence txt = mBook.getText();
 					Log.d("do show", (String) txt);
-					// debug((String) txt);
+			
 					runOnUiThread(new Runnable() {
 						public void run() {
 							try {
-								// mBody.setText(txt);
+						
 								// new loadContentTask().execute((String)txt);
 								// mWebView.loadUrl("javascript:settext('" +txt
 								// + "');");
 								//VeaderActivity.this.settext(txt);
-								new loadContentTask().execute(txt, "0");
+								//new loadContentTask().execute(txt, "0");
+								String jsCmd = "javascript:settext('"	+ txt.toString().replace("\n", ":br:") + "',"+String.valueOf(VeaderActivity.this.fltPercent)+");";
+								Log.d("JSCOMD", "javascript:settext('"	 + "',"+String.valueOf(VeaderActivity.this.fltPercent)+");");
+								mWebView.loadUrl(jsCmd);
+								
 								if (offset > 0) {
 									new Handler().postDelayed(new Runnable() {
 										public void run() {
@@ -560,18 +566,16 @@ private ZoomControls zoomControl;
 				// values.put(BookmarkColumn.NAME, mBook.mName);
 				values.put(BookmarkColumn.PAGE , this.pageno );
 				values.put(BookmarkColumn.TOTALPAGE , this.totalPage );
-				values.put(BookmarkColumn.CHAPTER, mBook.mPage);
+				values.put(BookmarkColumn.CHAPTER, mBook.mPage-1);
 				values.put(BookmarkColumn.NAME , mBook.getname());
 				values.put(BookmarkColumn.DESCRIPTION, mBook.getname());
+				values.put(BookmarkColumn.BOOKID, this.bookid);
 
 				
 				Uri result = getContentResolver().insert(BookmarkColumn.CONTENT_URI, values);
 				return true;
 			}
-	/**
-	 * Provides a hook for calling "alert" from javascript. Useful for debugging
-	 * your javascript.
-	 */
+
 
 	public boolean nextChapter() {
 		isLastChapterLastPage = false;
@@ -612,7 +616,6 @@ private ZoomControls zoomControl;
 		txtbottomleft = (TextView) findViewById(R.id.txtbottomleft);
 		txtbottomright = (TextView) findViewById(R.id.txtbottomright);
 		txtbottomcenter = (TextView) findViewById(R.id.txtbottomcenter);
-	//	TableLayout tablebottom = (TableLayout) findViewById(R.id.tablebottom);
 
 		SpannableStringBuilder builder, buildertxtbottomright;
 		buildertxtbottomright = new SpannableStringBuilder();
@@ -638,8 +641,7 @@ private ZoomControls zoomControl;
 		mWebView.setScrollContainer(isRestricted());
 
 		mWebView.addJavascriptInterface(new DemoJavaScriptInterface(), "demo");
-		// mWebView.setBackgroundDrawable(getResources().getDrawable(
-		// R.drawable.paper3));
+		
 		// tablebottom.setBackgroundColor(150);
 		mWebView.loadUrl("file:///android_asset/view.html");
 		mWebView.setVerticalScrollBarEnabled(false);
@@ -665,11 +667,23 @@ private ZoomControls zoomControl;
 		HandlerThread thread = new HandlerThread("reader");
 		thread.start();
 		pHandler = new Handler(thread.getLooper());
-
+		int _paramPage, _paramTotalPage;
 		setProgressBarIndeterminate(true);
 		// long id =2;
 		long id = getIntent().getExtras().getLong("ID");
+		int intParamChapter = getIntent().getExtras().getInt("CHAPTER");
+		this.fltPercent = getIntent().getExtras().getInt("PERCENT");
+		_paramPage =  getIntent().getExtras().getInt("PAGE");
+		_paramTotalPage =  getIntent().getExtras().getInt("TOTALPAGE");
+		this.bookid = id;
+	float _percent = (float)_paramPage/(float)_paramTotalPage;
+	this.fltPercent = _percent;
 		Log.d("bookid:", String.valueOf(id));
+		Log.d("intParamChapter:", String.valueOf(intParamChapter));
+		Log.d("fltPercent:", String.valueOf(fltPercent));
+		Log.d("_paramPage:", String.valueOf(_paramPage));
+		Log.d("_paramTotalPage:", String.valueOf(_paramTotalPage));
+		Log.d("percent:", String.valueOf(percent));
 		Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + id);
 		Log.d("pdburl", pdbUri.toString());
 		Cursor cursor = getContentResolver().query(
@@ -703,7 +717,7 @@ private ZoomControls zoomControl;
 			lastOffset = cursor.getInt(offsetIdx);
 			name = cursor.getString(nameIdx);
 		}
-		Log.d("filename:", name);
+		Log.d("lastPage:", String.valueOf(lastPage));
 		Log.d("path:", path);
 		cursor.close();
 
@@ -713,23 +727,28 @@ private ZoomControls zoomControl;
 			mBook.setEncode(encode);
 			mBook.setFormat(format);
 			mBook.setFile(f);
-
-			mBook.setPage(lastPage);
+			int _p;
+if(getIntent().getExtras().getInt("CHAPTER")>0){
+			_p=(getIntent().getExtras().getInt("CHAPTER"));
+}else
+{
+	_p = lastPage;
+}
+Log.d("toChaptere/?", String.valueOf(_p));
+mBook.setPage(_p);
 			mBook.setName(name);
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage(), e);
 		}
 		txtbottomleft.setText(mBook.mName);
-		// mBook.nextPage();
+	
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
 
-				// mWebView.loadUrl("javascript:settext('" + "test" + "');");
+			
 				doShow(VeaderActivity.this.lastOffset);
-				// runOnUiThread(returnRes);
-				// returnRes.run();
-				// Log.d("do show", (String)txt);
+			
 			}
 		});
 
@@ -859,10 +878,7 @@ Log.d("creatingdialog", Integer.toString(id));
 		
     		
 			return new menuVeaderActivity(this);
-//break;
-		//case BRIGHTNESS_DIALOG:
-			//return new BrightnessDialog(this);
-//return null;
+
 		}
 		return null;
 	}
@@ -942,10 +958,7 @@ Log.d("creatingdialog", Integer.toString(id));
 					+ ");");
 
 			break;
-		case SimpleGestureFilter.SWIPE_LEFT:
-			mWebView.loadUrl("javascript:settext(" + "約莫有六尺左右的身材，他那麼挺直的立著"
-					+ ");");
-			break;
+	
 		case SimpleGestureFilter.SWIPE_DOWN:
 		case SimpleGestureFilter.SWIPE_UP:
 
@@ -991,6 +1004,7 @@ Log.d("creatingdialog", Integer.toString(id));
 
 	}
 	final void settext(CharSequence strtxt) {
+		Log.d("settext",String.valueOf( mBook.mPage));
 		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
 				"\n\n");
 		mWebView.loadUrl("javascript:settext('"
@@ -998,10 +1012,11 @@ Log.d("creatingdialog", Integer.toString(id));
 
 	}
 	final void settext(CharSequence strtxt, int pos) {
+		Log.d("settext",String.valueOf( mBook.mPage));
 		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
 				"\n\n");
-		mWebView.loadUrl("javascript:settext('"
-				+ strParam.toString().replace("\n", ":br:") + "',100);");
+//		mWebView.loadUrl("javascript:settext('"	+ strParam.toString().replace("\n", ":br:") + "',100);");
+		mWebView.loadUrl("javascript:settext('"	+ strParam.toString().replace("\n", ":br:") + "',"+String.valueOf(pos)+");");
 
 	}
 	public final void showProgressBarVisibility(boolean visible) {
@@ -1014,7 +1029,7 @@ Log.d("updatecurrentpage", "");
 		Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
 		ContentValues values = new ContentValues();
 		// values.put(BookColumn.NAME, mBook.mName);
-		values.put(BookColumn.LAST_PAGE, mBook.mPage);
+		values.put(BookColumn.LAST_PAGE, mBook.mPage-1);
 		values.put(BookColumn.ENDCODE, mBook.mEncode);
 		values.put(BookColumn.FORMAT, mBook.mFormat);
 		values.put(BookColumn.LAST_OFFSET, VeaderActivity.this.currentChapter-1);
@@ -1024,5 +1039,10 @@ Log.d("updatecurrentpage", "");
 
 		int result = getContentResolver().update(pdbUri, values, null, null);
 		return true;
+	}
+
+	public void listAllBookMark() {
+		// TODO Auto-generated method stub
+		
 	}
 }
