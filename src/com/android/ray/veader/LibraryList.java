@@ -363,14 +363,13 @@ private static final int diag_confirmdelete = 1;
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
-	@Override
+	/*@Override
 	public void onBackPressed() {
 		boolean isBookList = this.getListAdapter().equals(_bookcursorAdapter);
 		boolean isLibList = this.getListAdapter().equals(_libcursorAdapter);
 		if (!isLibList) {
 			try {
 
-				//getLibraries(new File("/sdcard/"));
 				libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
 						null, CatalogColumn.DEFAULT_SORT_ORDER);
 				this.setListAdapter(new LibCursorAdapter(this, libCursor));
@@ -386,9 +385,13 @@ private static final int diag_confirmdelete = 1;
 			this.finish();
 		}
 
-	}
+	}*/
 
-
+public void showLib(){
+	libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
+			null, CatalogColumn.DEFAULT_SORT_ORDER);
+	this.setListAdapter(new LibCursorAdapter(this, libCursor));
+}
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		AdapterView.AdapterContextMenuInfo info;
@@ -449,6 +452,7 @@ private static final int diag_confirmdelete = 1;
 		getListView().setOnCreateContextMenuListener(this);
 		final Button btnAdd = (Button) findViewById(R.id.btnAddLib);
 		final Button btnBookMark = (Button) findViewById(R.id.btn_bookmark);
+		final Button btnHome = (Button) findViewById(R.id.btn_home);
 		btnAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 			
@@ -469,17 +473,25 @@ private static final int diag_confirmdelete = 1;
 			}
 		});
 		
-		ListView list = this.getListView();
-
-		list.setOnLongClickListener(new OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View arg0) {
-				Log.i("onlongclick", "");
-				return false;
+		btnHome.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+			
+					LibraryList.this.showLib();
 			}
 		});
+		ListView list = this.getListView();
 
-		
+Log.d("extra?", String.valueOf(getIntent().getExtras()));
+Log.d("got action?", String.valueOf(getIntent().getExtras()));
+		if (getIntent().getExtras() != null && 
+                getIntent().getExtras().containsKey("ACTION") ) 
+            {
+			Log.d("got action?2", String.valueOf(getIntent().getExtras()));
+		String strAction= getIntent().getExtras().getString("ACTION");
+		if(strAction.equals("BOOKMARK")){
+			listAllBookMark();
+		}
+		}
 
 	}
 public void listAllBookMark(){

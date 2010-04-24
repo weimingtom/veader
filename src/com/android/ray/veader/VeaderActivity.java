@@ -86,6 +86,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 
 		}
 	}
+
 	private class loadContentTask extends AsyncTask<CharSequence, Void, String> {
 		private final ProgressDialog dialog = new ProgressDialog(
 				VeaderActivity.this);
@@ -102,7 +103,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 				pos = Integer.parseInt(args[1].toString());
 			}
 			// paramTxt = this.wrap(paramTxt, 27, null, true);
-		//	Log.d("settextactivity", paramTxt);
+			// Log.d("settextactivity", paramTxt);
 			VeaderActivity.this.settext(args[0], pos);
 
 			return "";
@@ -115,7 +116,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			}
 			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
 					+ mBook.getPageCount());
-	
+
 		}
 
 		// can use UI thread here
@@ -184,6 +185,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 		}
 
 	}
+
 	private class loadContentTaskLast extends
 			AsyncTask<CharSequence, Void, String> {
 		private final ProgressDialog dialog = new ProgressDialog(
@@ -192,10 +194,10 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 		// automatically done on worker thread (separate from UI thread)
 		protected String doInBackground(final CharSequence... args) {
 			// List<String> names =
-	
+
 			String paramTxt = args[0].toString();
 			// paramTxt = this.wrap(paramTxt, 27, null, true);
-			//Log.d("settextactivity", paramTxt);
+			// Log.d("settextactivity", paramTxt);
 			VeaderActivity.this.settext(args[0], 100);
 
 			return "";
@@ -208,7 +210,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			}
 			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
 					+ mBook.getPageCount());
-		
+
 		}
 
 		// can use UI thread here
@@ -218,98 +220,104 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 		}
 
 	}
-	private class menuVeaderActivity extends Dialog{
-		//private ArrayList<_menuItem> _menulist = null;
-		//private menuAdapter mAdapter;
+
+	private class menuVeaderActivity extends Dialog {
+		// private ArrayList<_menuItem> _menulist = null;
+		// private menuAdapter mAdapter;
 		Context ctx;
 		private long totalPage;
 		private long currentPage;
 		private int selectedPage;
-		 private TextView txtpageno;
-	    public menuVeaderActivity(Context context) {
-	    	
-	        super(context);
-	        ctx = context;
-	        this.totalPage = VeaderActivity.this.totalPage;
-	        this.currentPage  = VeaderActivity.this.pageno;
-	    }
-	   
-	    //@override
+		private TextView txtpageno;
 
-	    //@override
-	    protected void onCreate(Bundle savedInstanceState) {
-	        super.onCreate(savedInstanceState);
-	        
-	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-	        
-	        setContentView(R.layout.gotopage);
-	        setCancelable(true);
-	        setCanceledOnTouchOutside(true);
-	        
+		public menuVeaderActivity(Context context) {
 
+			super(context);
+			ctx = context;
+			this.totalPage = VeaderActivity.this.totalPage;
+			this.currentPage = VeaderActivity.this.pageno;
+		}
 
-	        
-	        SeekBar seek = (SeekBar)findViewById(R.id.page_seek);
-	         txtpageno = (TextView)findViewById(R.id.txtpageno);
-	        
-	        seek.setMax((int)totalPage-1);
-	        
-	        txtpageno.setText(String.valueOf(VeaderActivity.this.pageno) +"/"+String.valueOf(VeaderActivity.this.totalPage));
-	       // int ib = Settings.System.getInt(getContext().getContentResolver(),
-	       //         Settings.System.SCREEN_BRIGHTNESS,100); 
-	        
-	       // seek.setProgress(ctx.);
-	   	 Button btnGoto = (Button) findViewById(R.id.btngotopage);
+		// @override
 
-	    	btnGoto.setOnClickListener(new View.OnClickListener() {
+		// @override
+		protected void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
+			setContentView(R.layout.gotopage);
+			setCancelable(true);
+			setCanceledOnTouchOutside(true);
+
+			SeekBar seek = (SeekBar) findViewById(R.id.page_seek);
+			txtpageno = (TextView) findViewById(R.id.txtpageno);
+
+			seek.setMax((int) totalPage - 1);
+
+			txtpageno.setText(String.valueOf(VeaderActivity.this.pageno) + "/"
+					+ String.valueOf(VeaderActivity.this.totalPage));
+			// int ib =
+			// Settings.System.getInt(getContext().getContentResolver(),
+			// Settings.System.SCREEN_BRIGHTNESS,100);
+
+			// seek.setProgress(ctx.);
+			Button btnGoto = (Button) findViewById(R.id.btngotopage);
+
+			btnGoto.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) {
-//VeaderActivity.this.debug("xxxx");
-String jsCmd = "javascript:SimpleReader.goto("+String.valueOf(menuVeaderActivity.this.selectedPage)+");";
-Log.d("jscommand", jsCmd);
-VeaderActivity.this.mWebView.loadUrl(jsCmd);
+					// VeaderActivity.this.debug("xxxx");
+					String jsCmd = "javascript:SimpleReader.goto("
+							+ String
+									.valueOf(menuVeaderActivity.this.selectedPage)
+							+ ");";
+					Log.d("jscommand", jsCmd);
+					VeaderActivity.this.mWebView.loadUrl(jsCmd);
 					Log.d("onclick!", "");
 				}
 			});
-	        
-	        seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 
-	            //@override
-	            public void onProgressChanged(SeekBar seekbar, int i, boolean flag) {
-	                /*
-	                WindowManager.LayoutParams lp = getOwnerActivity().getWindow().getAttributes();
-	                lp.screenBrightness = Math.max(5,i)/255f;
-	                getOwnerActivity().getWindow().setAttributes(lp);*/
-	            	menuVeaderActivity.this.selectedPage = (i==0)?1:i;
-	            	int seekpos =menuVeaderActivity.this.selectedPage;
-	            	Log.d("seekpos", String.valueOf(menuVeaderActivity.this.selectedPage));
-	            	if(seekpos==(VeaderActivity.this.totalPage-1))
-	            		VeaderActivity.this.previousPage = VeaderActivity.this.totalPage-1;
-	            	menuVeaderActivity.this. txtpageno.setText(String.valueOf(seekpos+1) +"/"+String.valueOf(VeaderActivity.this.totalPage));
-	        	    
-	            }
+			seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-	            //@override
-	            public void onStartTrackingTouch(SeekBar seekbar) {
-	              
-	            }
+				// @override
+				public void onProgressChanged(SeekBar seekbar, int i,
+						boolean flag) {
+					/*
+					 * WindowManager.LayoutParams lp =
+					 * getOwnerActivity().getWindow().getAttributes();
+					 * lp.screenBrightness = Math.max(5,i)/255f;
+					 * getOwnerActivity().getWindow().setAttributes(lp);
+					 */
+					menuVeaderActivity.this.selectedPage = (i == 0) ? 1 : i;
+					int seekpos = menuVeaderActivity.this.selectedPage;
+					Log.d("seekpos", String
+							.valueOf(menuVeaderActivity.this.selectedPage));
+					if (seekpos == (VeaderActivity.this.totalPage - 1))
+						VeaderActivity.this.previousPage = VeaderActivity.this.totalPage - 1;
+					menuVeaderActivity.this.txtpageno.setText(String
+							.valueOf(seekpos + 1)
+							+ "/"
+							+ String.valueOf(VeaderActivity.this.totalPage));
 
-	            //@override
-	            public void onStopTrackingTouch(SeekBar seekbar) {
-	                
-	            }
-	            
-	        });
-	        //end seek bar onlist
-	    
-	        
-	        
-	    }
-	    
+				}
 
-	    
+				// @override
+				public void onStartTrackingTouch(SeekBar seekbar) {
 
+				}
+
+				// @override
+				public void onStopTrackingTouch(SeekBar seekbar) {
+
+				}
+
+			});
+			// end seek bar onlist
+
+		}
 
 	}
+
 	private class MyGestureDetector extends SimpleOnGestureListener {
 		private static final int SWIPE_MIN_DISTANCE = 120;
 		private static final int SWIPE_MAX_OFF_PATH = 250;
@@ -366,12 +374,13 @@ VeaderActivity.this.mWebView.loadUrl(jsCmd);
 			return true;
 		}
 	}
+
 	final class MyWebChromeClient extends WebChromeClient {
 		@Override
 		public boolean onJsAlert(WebView view, String url, String message,
 				JsResult result) {
 			Log.d(LOG_TAG, message);
-			
+
 			String[] msg = message.toString().split(":");
 			if (msg[0].compareTo("percent") == 0) {
 				percent = msg[1];
@@ -384,46 +393,47 @@ VeaderActivity.this.mWebView.loadUrl(jsCmd);
 				} else {
 					VeaderActivity.this.isLastChapterLastPage = false;
 				}
-				if((VeaderActivity.this.previousPage ==VeaderActivity.this.totalPage )
-						&&(percent.equals("100"))){
-						 nextChapter();
-					}
-					
-			}
-			if (msg[0].compareTo("pagecount") == 0)
-			{
-				txtbottomcenter.setText("P." + msg[1]);
-			try {
-				VeaderActivity.this.previousPage =VeaderActivity.this.pageno; 
-				VeaderActivity.this.pageno =Integer.parseInt( msg[1].split("/")[0]);
-				if(msg[1].split("/").length>1){
-					VeaderActivity.this.totalPage =Integer.parseInt( msg[1].split("/")[1]);
+				if ((VeaderActivity.this.previousPage == VeaderActivity.this.totalPage)
+						&& (percent.equals("100"))) {
+					nextChapter();
 				}
-				else
-				{
-					VeaderActivity.this.totalPage = 1;
-				}
-				Log.d("pageno", String.valueOf(VeaderActivity.this.pageno));
-				Log.d("totalpageno", String.valueOf(VeaderActivity.this.totalPage));
-				
-				if (Integer.parseInt(msg[1].split("/")[0]) == 0) {
-					Log.d("msg[1]??" , msg[1]);
-					Log.d("msg[1].split('/')[0]?" , msg[1].split("/")[0]);
-					previousChapter(100);
-				}
-				VeaderActivity.this.currentChapter = Integer.parseInt(msg[1]
-						.split("/")[0]);
-				VeaderActivity.this.updateCurrentPage();
-			} catch (Exception e) {
-				debug(e.getMessage());
 
 			}
+			if (msg[0].compareTo("pagecount") == 0) {
+				txtbottomcenter.setText("P." + msg[1]);
+				try {
+					VeaderActivity.this.previousPage = VeaderActivity.this.pageno;
+					VeaderActivity.this.pageno = Integer.parseInt(msg[1]
+							.split("/")[0]);
+					if (msg[1].split("/").length > 1) {
+						VeaderActivity.this.totalPage = Integer.parseInt(msg[1]
+								.split("/")[1]);
+					} else {
+						VeaderActivity.this.totalPage = 1;
+					}
+					Log.d("pageno", String.valueOf(VeaderActivity.this.pageno));
+					Log.d("totalpageno", String
+							.valueOf(VeaderActivity.this.totalPage));
+
+					if (Integer.parseInt(msg[1].split("/")[0]) == 0) {
+						Log.d("msg[1]??", msg[1]);
+						Log.d("msg[1].split('/')[0]?", msg[1].split("/")[0]);
+						previousChapter(100);
+					}
+					VeaderActivity.this.currentChapter = Integer
+							.parseInt(msg[1].split("/")[0]);
+					VeaderActivity.this.updateCurrentPage();
+				} catch (Exception e) {
+					debug(e.getMessage());
+
+				}
 			}
 			result.confirm();
 			return true;
 		}
 
 	}
+
 	private static final String LOG_TAG = "WebViewDemo";
 	private String percent;
 	private WebView mWebView;
@@ -439,7 +449,7 @@ VeaderActivity.this.mWebView.loadUrl(jsCmd);
 	private static final int REQUEST_COLOR = 0x123;
 	private int mPage;
 	private long previousPage;
-private ZoomControls zoomControl;
+	private ZoomControls zoomControl;
 	private AbstractBookInfo mBook;
 
 	private SimpleGestureFilter filter;
@@ -447,7 +457,7 @@ private ZoomControls zoomControl;
 	private GestureDetector gestureDetector;
 
 	View.OnTouchListener gestureListener;
-private int paramPage;
+	private int paramPage;
 	private Handler pHandler;
 
 	private int totalPage;
@@ -468,7 +478,7 @@ private int paramPage;
 	private static final int MENU_LIB = 5;
 
 	private static final int MENU_BOOKMARK = 6;
-	
+
 	private static final int ENCODE_DIALOG = 3;
 
 	private static final int FORMAT_DIALOG = 1;
@@ -490,6 +500,7 @@ private int paramPage;
 		this.filter.onTouchEvent(me);
 		return super.dispatchTouchEvent(me);
 	}
+
 	/*
 	 * private Runnable returnRes = new Runnable() {
 	 * 
@@ -511,20 +522,32 @@ private int paramPage;
 					mBook.nextPage();
 					final CharSequence txt = mBook.getText();
 					Log.d("do show", (String) txt);
-			
+
 					runOnUiThread(new Runnable() {
 						public void run() {
 							try {
-						
+
 								// new loadContentTask().execute((String)txt);
 								// mWebView.loadUrl("javascript:settext('" +txt
 								// + "');");
-								//VeaderActivity.this.settext(txt);
-								//new loadContentTask().execute(txt, "0");
-								String jsCmd = "javascript:settext('"	+ txt.toString().replace("\n", ":br:") + "',"+String.valueOf(VeaderActivity.this.fltPercent)+");";
-								Log.d("JSCOMD", "javascript:settext('"	 + "',"+String.valueOf(VeaderActivity.this.fltPercent)+");");
+								// VeaderActivity.this.settext(txt);
+								// new loadContentTask().execute(txt, "0");
+								String jsCmd = "javascript:settext('"
+										+ txt.toString().replace("\n", ":br:")
+										+ "',"
+										+ String
+												.valueOf(VeaderActivity.this.fltPercent)
+										+ ");";
+								Log
+										.d(
+												"JSCOMD",
+												"javascript:settext('"
+														+ "',"
+														+ String
+																.valueOf(VeaderActivity.this.fltPercent)
+														+ ");");
 								mWebView.loadUrl(jsCmd);
-								
+
 								if (offset > 0) {
 									new Handler().postDelayed(new Runnable() {
 										public void run() {
@@ -559,23 +582,24 @@ private int paramPage;
 		});
 
 	}
+
 	public boolean insertBookmark(int i) {
-		Log.d("udpatebookmark", String.valueOf(VeaderActivity.this.currentChapter));
-				//Uri pdbUri = Uri.parse(BookmarkColumn.CONTENT_URI + "/" + mBook.mID);
-				ContentValues values = new ContentValues();
-				// values.put(BookmarkColumn.NAME, mBook.mName);
-				values.put(BookmarkColumn.PAGE , this.pageno );
-				values.put(BookmarkColumn.TOTALPAGE , this.totalPage );
-				values.put(BookmarkColumn.CHAPTER, mBook.mPage-1);
-				values.put(BookmarkColumn.NAME , mBook.getname());
-				values.put(BookmarkColumn.DESCRIPTION, mBook.getname());
-				values.put(BookmarkColumn.BOOKID, this.bookid);
+		Log.d("udpatebookmark", String
+				.valueOf(VeaderActivity.this.currentChapter));
+		// Uri pdbUri = Uri.parse(BookmarkColumn.CONTENT_URI + "/" + mBook.mID);
+		ContentValues values = new ContentValues();
+		// values.put(BookmarkColumn.NAME, mBook.mName);
+		values.put(BookmarkColumn.PAGE, this.pageno);
+		values.put(BookmarkColumn.TOTALPAGE, this.totalPage);
+		values.put(BookmarkColumn.CHAPTER, mBook.mPage - 1);
+		values.put(BookmarkColumn.NAME, mBook.getname());
+		values.put(BookmarkColumn.DESCRIPTION, mBook.getname());
+		values.put(BookmarkColumn.BOOKID, this.bookid);
 
-				
-				Uri result = getContentResolver().insert(BookmarkColumn.CONTENT_URI, values);
-				return true;
-			}
-
+		Uri result = getContentResolver().insert(BookmarkColumn.CONTENT_URI,
+				values);
+		return true;
+	}
 
 	public boolean nextChapter() {
 		isLastChapterLastPage = false;
@@ -589,24 +613,21 @@ private int paramPage;
 			Log.d("dnxt page", "has page");
 			try {
 				final CharSequence txt = mBook.getText();
-				// debug (txt);
-				//Log.d("hasnext!!", (String) txt);
+
 				Log.d("hasnext!!", "");
 				String temp = txt.toString().replace("\n", ":br:");
 
-				// mWebView.loadUrl("javascript:settext('" +temp + "');");
-				// doShow(0);
 				new loadContentTask().execute(txt, "0");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-		
 			// scrollview.scrollTo(0, 0);
 		}
 		return true;
 	}
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		// gestureScanner = new GestureDetector(this);
@@ -641,7 +662,7 @@ private int paramPage;
 		mWebView.setScrollContainer(isRestricted());
 
 		mWebView.addJavascriptInterface(new DemoJavaScriptInterface(), "demo");
-		
+
 		// tablebottom.setBackgroundColor(150);
 		mWebView.loadUrl("file:///android_asset/view.html");
 		mWebView.setVerticalScrollBarEnabled(false);
@@ -662,7 +683,7 @@ private int paramPage;
 
 		mWebView.setOnTouchListener(gestureListener);
 
-		//final Button btnTest = (Button) findViewById(R.id.btnTest);
+		// final Button btnTest = (Button) findViewById(R.id.btnTest);
 
 		HandlerThread thread = new HandlerThread("reader");
 		thread.start();
@@ -673,11 +694,11 @@ private int paramPage;
 		long id = getIntent().getExtras().getLong("ID");
 		int intParamChapter = getIntent().getExtras().getInt("CHAPTER");
 		this.fltPercent = getIntent().getExtras().getInt("PERCENT");
-		_paramPage =  getIntent().getExtras().getInt("PAGE");
-		_paramTotalPage =  getIntent().getExtras().getInt("TOTALPAGE");
+		_paramPage = getIntent().getExtras().getInt("PAGE");
+		_paramTotalPage = getIntent().getExtras().getInt("TOTALPAGE");
 		this.bookid = id;
-	float _percent = (float)_paramPage/(float)_paramTotalPage;
-	this.fltPercent = _percent;
+		float _percent = (float) _paramPage / (float) _paramTotalPage;
+		this.fltPercent = _percent;
 		Log.d("bookid:", String.valueOf(id));
 		Log.d("intParamChapter:", String.valueOf(intParamChapter));
 		Log.d("fltPercent:", String.valueOf(fltPercent));
@@ -728,94 +749,94 @@ private int paramPage;
 			mBook.setFormat(format);
 			mBook.setFile(f);
 			int _p;
-if(getIntent().getExtras().getInt("CHAPTER")>0){
-			_p=(getIntent().getExtras().getInt("CHAPTER"));
-}else
-{
-	_p = lastPage;
-}
-Log.d("toChaptere/?", String.valueOf(_p));
-mBook.setPage(_p);
+			if (getIntent().getExtras().getInt("CHAPTER") > 0) {
+				_p = (getIntent().getExtras().getInt("CHAPTER"));
+			} else {
+				_p = lastPage;
+			}
+			Log.d("toChaptere/?", String.valueOf(_p));
+			mBook.setPage(_p);
 			mBook.setName(name);
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage(), e);
 		}
 		txtbottomleft.setText(mBook.mName);
-	
+
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
 
-			
 				doShow(VeaderActivity.this.lastOffset);
-			
+
 			}
 		});
 
-		
-
 	}
+
 	// @override
 	protected Dialog onCreateDialog(int id) {
-Log.d("creatingdialog", Integer.toString(id));
+		Log.d("creatingdialog", Integer.toString(id));
 		switch (id) {
 		case diag_Menu:
-			final CharSequence[] items = {getString(R.string.menu_gotopage),
+			final CharSequence[] items = { getString(R.string.menu_gotopage),
 					getString(R.string.menu_next5),
-					getString(R.string.menu_previous5), 
-					getString(R.string.menu_nextchapter), 
-					getString(R.string.menu_previouschapter), 
-					getString(R.string.menu_addbookmark)
-					};
+					getString(R.string.menu_previous5),
+					getString(R.string.menu_nextchapter),
+					getString(R.string.menu_previouschapter),
+					getString(R.string.menu_addbookmark) };
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("");
-		
+
 			builder.setItems(items, new DialogInterface.OnClickListener() {
-				
-			    public void onClick(DialogInterface dialog, int item) {
-			    	Log.d("currentPage", String.valueOf( VeaderActivity.this.pageno));
-			    	Log.d("totalPage", String.valueOf( VeaderActivity.this.totalPage));
-			    	switch (item){
-			    	case 0:
-			    		Context mContext = getApplicationContext();
-			    		/*
-			    		Context mContext = getApplicationContext();
-			    		Dialog _dialog = new Dialog(mContext);
 
-			    		_dialog.setContentView(R.layout.gotopage);
-			    		_dialog.setTitle("Go to Page");
+				public void onClick(DialogInterface dialog, int item) {
+					Log.d("currentPage", String
+							.valueOf(VeaderActivity.this.pageno));
+					Log.d("totalPage", String
+							.valueOf(VeaderActivity.this.totalPage));
+					switch (item) {
+					case 0:
+						Context mContext = getApplicationContext();
+						/*
+						 * Context mContext = getApplicationContext(); Dialog
+						 * _dialog = new Dialog(mContext);
+						 * 
+						 * _dialog.setContentView(R.layout.gotopage);
+						 * _dialog.setTitle("Go to Page");
+						 * 
+						 * TextView text = (TextView)
+						 * _dialog.findViewById(R.id.txtpageno);
+						 * text.setText("Hello, this is a custom dialog!");
+						 */
+						dismissDialog(diag_Menu);
+						showDialog(diag_goto);
+						break;
+					case 1:
 
-			    		TextView text = (TextView) _dialog.findViewById(R.id.txtpageno);
-			    		text.setText("Hello, this is a custom dialog!");
-*/
-			    		dismissDialog  (diag_Menu);
-			    		showDialog(diag_goto);
-			    		break;
-			    	case 1:
-			 
-			    			Log.d("next 5 page", "next 5 page");
-			    			mWebView.loadUrl("javascript:SimpleReader.next(5);");
-			    			
-			    			break;
-			    	case 2:
-			    		Log.d("prv 5 page", "prev 5 page");
-		    			mWebView.loadUrl("javascript:SimpleReader.prev(5);");
-		    			break;
-			    	case 3:
-			    		nextChapter();
-			    		break;
-			    	case 4:
-			    		previousChapter(0);
-			    		break;
-			    	case 5:
-			    		insertBookmark(0);
-			    		break;
-			    	}
-			    	//dismissDialog  (diag_Menu);
-			        Toast.makeText(getApplicationContext(), items[item], Toast.LENGTH_SHORT).show();
-			        dismissDialog  (diag_Menu);
-			    }
+						Log.d("next 5 page", "next 5 page");
+						mWebView.loadUrl("javascript:SimpleReader.next(5);");
+
+						break;
+					case 2:
+						Log.d("prv 5 page", "prev 5 page");
+						mWebView.loadUrl("javascript:SimpleReader.prev(5);");
+						break;
+					case 3:
+						nextChapter();
+						break;
+					case 4:
+						previousChapter(0);
+						break;
+					case 5:
+						insertBookmark(0);
+						break;
+					}
+					// dismissDialog (diag_Menu);
+					Toast.makeText(getApplicationContext(), items[item],
+							Toast.LENGTH_SHORT).show();
+					dismissDialog(diag_Menu);
+				}
 			});
 
 			return builder.create();
@@ -875,27 +896,28 @@ Log.d("creatingdialog", Integer.toString(id));
 						}
 					}).create();
 		case diag_goto:
-		
-    		
+
 			return new menuVeaderActivity(this);
 
 		}
 		return null;
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		//menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
-	//			R.string.menu_text_size));
+		// menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
+		// R.string.menu_text_size));
 
-		//menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
-		//menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
-		menu.add(0, MENU_ROTATAION, MENU_ROTATAION, "");
-	//	menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
+		// menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
+		// menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
+		menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
+		// menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
 		menu.add(0, MENU_LIB, MENU_LIB, R.string.menu_lib);
-		//menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
+		// menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
 		return true;
 
 	}
+
 	@Override
 	public void onDoubleTap() {
 		// TODO Auto-generated method stub
@@ -914,6 +936,22 @@ Log.d("creatingdialog", Integer.toString(id));
 			// mBody.moveCursorToVisibleOffset();
 		} else if (item.getItemId() == MENU_CHARSET) {
 			showDialog(ENCODE_DIALOG);
+		} else if (item.getItemId() == MENU_BOOKMARK) {
+			Intent intent = new Intent();
+
+			intent.setClassName(VeaderActivity.this, LibraryList.class
+					.getName());
+			
+			//startActivity(intent);
+			
+			
+			intent.putExtra("ACTION","BOOKMARK");
+	
+			startActivity(intent);
+			//Intent intent = new Intent(this, bookmarkDialog.class);
+
+           // startActivityForResult(intent, REQUEST_COLOR);
+			//showDialog(MENU_BOOKMARK);
 		} else if (item.getItemId() == MENU_ROTATAION) {
 			if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
 				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);// .SCREEN_ORIENTATION_PORTRAIT);
@@ -935,15 +973,14 @@ Log.d("creatingdialog", Integer.toString(id));
 
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		/*
-		MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION);
-		if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-			rotationIgtem.setTitle(R.string.menu_lock);
-		} else {
-			rotationIgtem.setTitle(R.string.menu_unlock);
-		}
-*/
-		//MenuItem formatItem = menu.getItem(MENU_FORMAT);
-		//formatItem.setEnabled(mBook.supportFormat());
+		 * MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION); if
+		 * (getRequestedOrientation() ==
+		 * ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
+		 * rotationIgtem.setTitle(R.string.menu_lock); } else {
+		 * rotationIgtem.setTitle(R.string.menu_unlock); }
+		 */
+		// MenuItem formatItem = menu.getItem(MENU_FORMAT);
+		// formatItem.setEnabled(mBook.supportFormat());
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -958,26 +995,28 @@ Log.d("creatingdialog", Integer.toString(id));
 					+ ");");
 
 			break;
-	
+
 		case SimpleGestureFilter.SWIPE_DOWN:
 		case SimpleGestureFilter.SWIPE_UP:
 
 		}
 	}
+
 	public boolean previousChapter(int pos) {
 		Log.d("fn!prev page", "prev page");
 		Log.d("has prev?", String.valueOf(mBook.hasPrevPage()));
 		// new loadContentTask().execute("¦V¥k");
 		// VeaderActivity.this.settext("¦V¥k");
 		Log.d("currentPage", String.valueOf(mBook.mPage));
-		if(currentChapter==0)return false;
+		if (currentChapter == 0)
+			return false;
 		if (mBook.hasPrevPage()) {
 			// mBody.setText("");
 			mBook.prevPage();
 			if (mBook.isProgressing()) {
 				mBook.stop();
 			}
-	
+
 			try {
 				final CharSequence txt = mBook.getText();
 				// debug (txt);
@@ -997,42 +1036,50 @@ Log.d("creatingdialog", Integer.toString(id));
 		}
 		return true;
 	}
+
 	private void setPageTitle() {
 
 		txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
 				+ mBook.getPageCount());
 
 	}
+
 	final void settext(CharSequence strtxt) {
-		Log.d("settext",String.valueOf( mBook.mPage));
+		Log.d("settext", String.valueOf(mBook.mPage));
 		String strParam = strtxt.toString().replace("úD", "").replace("\n\n\n",
 				"\n\n");
 		mWebView.loadUrl("javascript:settext('"
 				+ strParam.toString().replace("\n", ":br:") + "',0);");
 
 	}
+
 	final void settext(CharSequence strtxt, int pos) {
-		Log.d("settext",String.valueOf( mBook.mPage));
+		Log.d("settext", String.valueOf(mBook.mPage));
 		String strParam = strtxt.toString().replace("úD", "").replace("\n\n\n",
 				"\n\n");
-//		mWebView.loadUrl("javascript:settext('"	+ strParam.toString().replace("\n", ":br:") + "',100);");
-		mWebView.loadUrl("javascript:settext('"	+ strParam.toString().replace("\n", ":br:") + "',"+String.valueOf(pos)+");");
+		// mWebView.loadUrl("javascript:settext('" +
+		// strParam.toString().replace("\n", ":br:") + "',100);");
+		mWebView.loadUrl("javascript:settext('"
+				+ strParam.toString().replace("\n", ":br:") + "',"
+				+ String.valueOf(pos) + ");");
 
 	}
+
 	public final void showProgressBarVisibility(boolean visible) {
 		// findViewById(R.id.progress_read).setVisibility(visible ?
 		// View.VISIBLE:View.GONE);
 	}
 
 	public boolean updateCurrentPage() {
-Log.d("updatecurrentpage", "");
+		Log.d("updatecurrentpage", "");
 		Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
 		ContentValues values = new ContentValues();
 		// values.put(BookColumn.NAME, mBook.mName);
-		values.put(BookColumn.LAST_PAGE, mBook.mPage-1);
+		values.put(BookColumn.LAST_PAGE, mBook.mPage - 1);
 		values.put(BookColumn.ENDCODE, mBook.mEncode);
 		values.put(BookColumn.FORMAT, mBook.mFormat);
-		values.put(BookColumn.LAST_OFFSET, VeaderActivity.this.currentChapter-1);
+		values.put(BookColumn.LAST_OFFSET,
+				VeaderActivity.this.currentChapter - 1);
 
 		Long now = Long.valueOf(System.currentTimeMillis());
 		values.put(BookColumn.CREATE_DATE, now);
@@ -1043,6 +1090,6 @@ Log.d("updatecurrentpage", "");
 
 	public void listAllBookMark() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
