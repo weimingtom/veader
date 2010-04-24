@@ -64,7 +64,16 @@ table.padded-table td {
 	SimpleReader.pageNo = (SimpleReader.totalPage/1-1)
 	alert('pagecount:'+SimpleReader.totalPage+'/'+SimpleReader.totalPage);
 	//SimpleReader.write(SimpleReader.totalPage);
-	}else{
+	}
+		else if((pos<1)&&(pos>0)){
+	toPage = SimpleReader.totalPage*pos;
+	toPage = Math.round(toPage);
+		SimpleReader.write(toPage/1-1);
+	SimpleReader.pageNo = (toPage/1-1)
+	alert('pagecount:'+toPage+'/'+SimpleReader.totalPage);
+	}
+	
+	else{
 	 alert('pagecount:'+'1/'+SimpleReader.totalPage);
 	 }
 	}
