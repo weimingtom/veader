@@ -35,6 +35,7 @@
 	<string name="empty_dir">Empty Directory</string>
 	<string name="prev">prev</string>
 	<string name="next">next</string>
+	<string name="addlib">Add Library</string>
 	<string name="parentdir">..(parent directory)</string>
 	<string name="sortby">Sort By...</string>
 	<string name="goto_root">Goto Root</string>
