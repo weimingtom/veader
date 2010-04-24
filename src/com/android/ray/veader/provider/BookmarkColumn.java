@@ -19,6 +19,7 @@ public final class BookmarkColumn implements BaseColumns {
     public static final String PAGE = "page";
     public static final String CHAPTER = "chapter";
     public static final String TOTALPAGE = "totalpage";
+    public static final String CREATEDATE= "createdate";
     public static final String TYPE = "type"; //use for top 1:top 0:normal
- 
+    public static final String DEFAULT_SORT_ORDER = "createdate desc";
 }

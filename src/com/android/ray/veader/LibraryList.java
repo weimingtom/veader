@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import com.android.ray.veader.R;
 import com.android.ray.veader.SimpleGestureFilter.SimpleGestureListener;
 
 import com.android.ray.veader.provider.BookColumn;
+import com.android.ray.veader.provider.BookmarkColumn;
 import com.android.ray.veader.provider.CatalogColumn;
 import com.android.ray.veader.util.libraryManager;
 
@@ -55,6 +58,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 
@@ -99,6 +103,70 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 			View v = inflater.inflate(R.layout.row_library, parent, false);
 	
 			return v;
+		}
+	}
+	public class bookmarkCursorAdapter extends CursorAdapter {
+		protected TextView tt, bt, txtRemark;
+		protected ImageView viewIcon;
+		protected View v;
+		public bookmarkCursorAdapter(Context context, Cursor c) {
+			super(context, c);
+			// TODO Auto-generated constructor stub
+		}
+
+		public void bindView(View view, Context context, Cursor cursor) {
+			//super.bindView(view, context, cursor);
+		
+
+			// int bookscount =
+			// application.getDataHelper().getBookCountByCatalogid(cursor.getInt(cursor.getColumnIndex(CatalogColumn._ID)));
+			View v = view;
+			if (v == null) {
+				LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				v = vi.inflate(R.layout.row_library, null);
+			}
+
+			tt = (TextView) v.findViewById(R.id.toptext);
+			bt = (TextView) v.findViewById(R.id.bottomtext);
+			txtRemark = (TextView) v.findViewById(R.id.txtRemark);
+			viewIcon = (ImageView) v.findViewById(R.id.rowicon);
+			String bookmarktitle = cursor.getString(cursor
+					.getColumnIndex(BookmarkColumn.NAME));
+			int strChapter = cursor.getInt(cursor
+					.getColumnIndex(BookmarkColumn.CHAPTER));
+	int pageno = cursor.getInt(cursor
+			.getColumnIndex(BookmarkColumn.PAGE));
+	int totalPage = cursor.getInt(cursor
+			.getColumnIndex(BookmarkColumn.TOTALPAGE));
+	
+	
+	float percent = (float)pageno/(float)totalPage;
+	long createdate = cursor.getLong(cursor
+			.getColumnIndex(BookmarkColumn.CREATEDATE));
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set the format to sql date time
+	Date date = new Date(createdate);
+String strDt= dateFormat.format(date).toString();
+	String strpercent = String.valueOf(percent) + "%";
+	String strRemark = strpercent+"-Create date:"+strDt;
+			viewIcon.setImageResource(R.drawable.btn_bookmark);
+			if (tt != null) {
+				tt.setText(bookmarktitle);
+			}
+			if (bt != null) {
+				bt.setText(strpercent);
+			}
+			if(txtRemark!=null)
+				txtRemark.setText("Chapter:"+strChapter);
+
+		}
+
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			LayoutInflater inflater = LayoutInflater.from(context);
+			View v = inflater.inflate(R.layout.row_library, parent, false);
+		 bindView(v, context, cursor);
+			return v;
+			
 		}
 	}
 	public class bookCursorAdapter extends CursorAdapter {
@@ -246,13 +314,15 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 private ProgressDialog m_ProgressDialog = null;
 
 
-	private ArrayList<Library> _library = null;
-	private ArrayList<Books> _booklist = null;
+	//private ArrayList<Library> _library = null;
+	//private ArrayList<Books> _booklist = null;
 	//	private libraryAdapter m_adapter;
 	//private BooksAdapter _bookAdapter;
 	private bookCursorAdapter _bookcursorAdapter;
+	private LibCursorAdapter _libcursorAdapter;
+	private bookmarkCursorAdapter _bookmarkcursorAdapter;
 	Thread thread;
-	private Cursor libCursor, bookCursor;
+	private Cursor libCursor, bookCursor, bookmarkCursor;
 	private SimpleGestureFilter filter;
 	private GestureDetector gestureDetector;
 
@@ -265,7 +335,9 @@ private ProgressDialog m_ProgressDialog = null;
 	private static final String[] BookField = new String[] { BookColumn._ID,
 			BookColumn.NAME, BookColumn.AUTHOR, BookColumn.ENDCODE,
 			BookColumn.PATH, BookColumn.RATING };
-
+	private static final String[] BookmarkField = new String[] { BookmarkColumn._ID,
+		BookmarkColumn.NAME, BookmarkColumn.PAGE, BookmarkColumn.TOTALPAGE, BookmarkColumn.BOOKID,
+		BookmarkColumn.CREATEDATE, BookmarkColumn.CHAPTER };
 	private static final String[] PROJECTION = new String[] {
 			CatalogColumn._ID, // 0
 			CatalogColumn.DESCRIPTION, // 1
@@ -294,7 +366,8 @@ private static final int diag_confirmdelete = 1;
 	@Override
 	public void onBackPressed() {
 		boolean isBookList = this.getListAdapter().equals(_bookcursorAdapter);
-		if (isBookList) {
+		boolean isLibList = this.getListAdapter().equals(_libcursorAdapter);
+		if (!isLibList) {
 			try {
 
 				//getLibraries(new File("/sdcard/"));
@@ -306,9 +379,11 @@ private static final int diag_confirmdelete = 1;
 				textCurrentFolder.setText(e.getMessage().toString());
 
 			}
-		} else {
-			super.onBackPressed();
-			// this.onDestroy();
+		}
+		
+		else {
+				super.onBackPressed();
+			this.finish();
 		}
 
 	}
@@ -326,14 +401,28 @@ private static final int diag_confirmdelete = 1;
 
 		switch (item.getItemId()) {
 		case MENU_ITEM_DELETE: {
+			boolean isLibList = this.getListAdapter().equals(_libcursorAdapter);
+			boolean isBookMarkList = this.getListAdapter().equals(_bookmarkcursorAdapter);
 			Log.d("selected id?", String.valueOf(info.id));
 			// Delete the note that the context menu is for
-			Uri pdbUri = Uri.parse(CatalogColumn.CONTENT_URI + "/" + info.id);
-			ContentValues values = new ContentValues();
-			// values.put(BookColumn.NAME, mBook.mName);
-
-			Log.d("uri", pdbUri.toString());
-			int result = getContentResolver().delete(pdbUri, "", null);
+			Uri pdbUri;
+			if(isLibList){
+			 pdbUri = Uri.parse(CatalogColumn.CONTENT_URI + "/" + info.id);
+				ContentValues values = new ContentValues();
+				
+				Log.d("uri", pdbUri.toString());
+				int result = getContentResolver().delete(pdbUri, "", null);
+			}
+			if(isBookMarkList){
+				
+				 pdbUri = Uri.parse(BookmarkColumn.CONTENT_URI + "/" + info.id);
+					ContentValues values = new ContentValues();
+					
+					Log.d("uri", pdbUri.toString());
+					int result = getContentResolver().delete(pdbUri, "", null);
+			}
+		
+		
 			// getLibraries(new File("/sdcard/"));
 			return true;
 		}
@@ -342,7 +431,7 @@ private static final int diag_confirmdelete = 1;
 	}
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		// 
+		
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.librarylist);
@@ -353,22 +442,16 @@ private static final int diag_confirmdelete = 1;
 		// + dbname, dblocation);
 		this.application = (MyApplication) this.getApplication();
 
-		// getLibraries(new File("/sdcard/"));
-
 		libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
 				null, CatalogColumn.DEFAULT_SORT_ORDER);
 		this.setListAdapter(new LibCursorAdapter(this, libCursor));
 
 		getListView().setOnCreateContextMenuListener(this);
 		final Button btnAdd = (Button) findViewById(R.id.btnAddLib);
-
+		final Button btnBookMark = (Button) findViewById(R.id.btn_bookmark);
 		btnAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// new
-				// InsertDataTask().execute(textCurrentFolder.getText().toString(),
-				// "a");
-				// libraryManager libManager = new libraryManager();
-				// @override
+			
 
 				Intent intent = new Intent();
 
@@ -378,6 +461,14 @@ private static final int diag_confirmdelete = 1;
 
 			}
 		});
+	
+		btnBookMark.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+			
+					LibraryList.this.listAllBookMark();
+			}
+		});
+		
 		ListView list = this.getListView();
 
 		list.setOnLongClickListener(new OnLongClickListener() {
@@ -391,26 +482,34 @@ private static final int diag_confirmdelete = 1;
 		
 
 	}
+public void listAllBookMark(){
+	bookmarkCursor = managedQuery(BookmarkColumn.CONTENT_URI, BookmarkField, null,
+			null, BookmarkColumn.DEFAULT_SORT_ORDER);
+	this._bookmarkcursorAdapter = new bookmarkCursorAdapter(this , bookmarkCursor);
+	setListAdapter(_bookmarkcursorAdapter);
+
+
+}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View view,
 			ContextMenuInfo menuInfo) {
 		boolean isBookList = this.getListAdapter().equals(_bookcursorAdapter);
-		if(!isBookList){
-		AdapterView.AdapterContextMenuInfo info;
-		try {
-			info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-		} catch (ClassCastException e) {
-			Log.e("", "bad menuInfo", e);
-			return;
+		if (!isBookList) {
+			AdapterView.AdapterContextMenuInfo info;
+			try {
+				info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+			} catch (ClassCastException e) {
+				Log.e("", "bad menuInfo", e);
+				return;
+			}
+
+			menu.setHeaderTitle("Delete");
+
+			// Add a menu item to delete the note
+			menu.add(0, MENU_ITEM_DELETE, 0, R.string.menu_delete);
 		}
 
-		menu.setHeaderTitle("Delete");
-
-		// Add a menu item to delete the note
-		menu.add(0, MENU_ITEM_DELETE, 0, R.string.menu_delete);
-		}
-		
 	}
 	// @override
 	protected Dialog onCreateDialog(int id) {
@@ -480,9 +579,8 @@ private static final int diag_confirmdelete = 1;
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		int selectedRow = (int) id;
-
 		boolean isBookList = this.getListAdapter().equals(this._bookcursorAdapter);
-
+		boolean isBookMarkList = this.getListAdapter().equals(this._bookmarkcursorAdapter);
 		if (isBookList) {
 			Log.d("bookid:?", String.valueOf(id));
 		
@@ -492,12 +590,43 @@ private static final int diag_confirmdelete = 1;
 			intent.setClassName(LibraryList.this, VeaderActivity.class
 					.getName());
 			startActivity(intent);
-		} else {
+		}else if(isBookMarkList){
+			Log.d("bookmark:?", String.valueOf(id));
+			Cursor _bmcursor = 	 managedQuery(BookmarkColumn.CONTENT_URI, BookmarkField, "_id="+String.valueOf(selectedRow),
+					null, BookColumn.DEFAULT_SORT_ORDER);
+			if (_bmcursor.moveToNext()) {
+				long bookid = _bmcursor.getLong(_bmcursor
+						.getColumnIndex(BookmarkColumn.BOOKID));
+				int pageno = _bmcursor.getInt(_bmcursor
+						.getColumnIndex(BookmarkColumn.PAGE));
+				int totalPage = _bmcursor.getInt(_bmcursor
+						.getColumnIndex(BookmarkColumn.TOTALPAGE));
+				int chapter = _bmcursor.getInt(_bmcursor
+						.getColumnIndex(BookmarkColumn.CHAPTER));
+				float percent = (float) pageno / (float) totalPage;
+				Log.d("bookid:?", String.valueOf(bookid));
+				Log.d("pageno:?", String.valueOf(pageno));
+				Log.d("totalPage:?", String.valueOf(totalPage));
+				Log.d("chapter:?", String.valueOf(chapter));
+				Intent intent = new Intent();
+				intent.putExtra("ID", bookid);
+				intent.putExtra("CHAPTER", chapter);
+				intent.putExtra("PAGE", pageno);
+				intent.putExtra("TOTALPAGE", totalPage);
+				intent.putExtra("PERCENT", percent);
+
+				Log.d("BOOKID", String.valueOf(id));
+				intent.setClassName(LibraryList.this, VeaderActivity.class
+						.getName());
+				startActivity(intent);
+			}
+		}
+		else {
 		
-			libCursor.moveToPosition(selectedRow-1);
+			//libCursor.moveToPosition(selectedRow-1);
 			Log.d("cursorpos:", String.valueOf(selectedRow));
-			int catalogid = libCursor.getInt(libCursor.getColumnIndex(CatalogColumn._ID)); 
-			 bookCursor = managedQuery(BookColumn.CONTENT_URI, BookField, "catalogid="+catalogid,
+			//int catalogid = libCursor.getInt(libCursor.getColumnIndex(CatalogColumn._ID)); 
+			 bookCursor = managedQuery(BookColumn.CONTENT_URI, BookField, "catalogid="+String.valueOf(selectedRow),
 					null, BookColumn.DEFAULT_SORT_ORDER);
 			this._bookcursorAdapter = new bookCursorAdapter(this, bookCursor);
 			this.setListAdapter(_bookcursorAdapter);

@@ -39,7 +39,7 @@ public class VeaderProvider extends ContentProvider {
     private static final int CATALOG_ID =4;
     
     private static HashMap<String, String> sNotesProjectionMap;
-    private static HashMap<String, String> sCatalogMap;
+    private static HashMap<String, String> sCatalogMap,sBookmarkMap;
     private static final UriMatcher sUriMatcher;
 
     /**
@@ -87,7 +87,7 @@ public class VeaderProvider extends ContentProvider {
     		db.execSQL("CREATE TABLE IF NOT EXISTS author (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
     						+ "name varchar, description varchar,  dob date, dod date);");
     		db.execSQL("CREATE TABLE IF NOT EXISTS bookmark (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-    						+ "name varchar,totalpage numeric, description varchar, bookid INT, page int,chapter int,type int);");
+    						+ "name varchar,totalpage numeric, description varchar, bookid INT, page int,chapter int,type int, createdate date default CURRENT_DATE);");
     		db.setTransactionSuccessful();
     		db.endTransaction();
           
@@ -95,7 +95,7 @@ public class VeaderProvider extends ContentProvider {
 
         //@override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-           db.execSQL("DROP TABLE IF EXISTS " + "bookmark");
+         //  db.execSQL("DROP TABLE IF EXISTS " + "bookmark");
           // db.execSQL("DROP TABLE IF EXISTS " + "catalog");
            //db.execSQL("DROP TABLE IF EXISTS " + "books");
            //db.execSQL("DROP TABLE IF EXISTS " + "author");
@@ -127,6 +127,16 @@ public class VeaderProvider extends ContentProvider {
             qb.setProjectionMap(sNotesProjectionMap);
             qb.appendWhere(BookColumn._ID + "=" + uri.getPathSegments().get(1));
             break;
+        case BOOKMARK:
+            qb.setTables("bookmark");
+            qb.setProjectionMap(sBookmarkMap);
+            break;
+
+        case BOOKMARK_ID:
+            qb.setTables("bookmark");
+            qb.setProjectionMap(sBookmarkMap);
+            qb.appendWhere(BookColumn._ID + "=" + uri.getPathSegments().get(1));
+            break;
         case CATALOG:
             qb.setTables("catalog");
             qb.setProjectionMap(sCatalogMap);
@@ -154,6 +164,7 @@ public class VeaderProvider extends ContentProvider {
         } else {
             orderBy += sortOrder;
         }
+        break;
         }
         // Get the database and run the query
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
@@ -171,6 +182,7 @@ public class VeaderProvider extends ContentProvider {
     //@override
     public Uri insertbookmark(Uri uri, ContentValues initialValues) {
         // Validate the requested uri
+    	Long now = Long.valueOf(System.currentTimeMillis());
         if (sUriMatcher.match(uri) != BOOKMARK) {
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -181,8 +193,10 @@ public class VeaderProvider extends ContentProvider {
         } else {
             values = new ContentValues();
         }
-
-        Long now = Long.valueOf(System.currentTimeMillis());
+        if (values.containsKey(BookColumn.CREATE_DATE) == false) {
+            values.put(BookColumn.CREATE_DATE, now);
+        }
+       
 
        
       
@@ -326,6 +340,15 @@ public class VeaderProvider extends ContentProvider {
             count = db.delete(TABLE_NAME, BookColumn._ID + "=" + noteId
                     + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
             break;
+        case BOOKMARK:
+            count = db.delete("bookmark", where, whereArgs);
+            break;
+
+        case BOOKMARK_ID:
+             noteId = uri.getPathSegments().get(1);
+            count = db.delete("bookmark", BookColumn._ID + "=" + noteId
+                    + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            break;
         case CATALOG:
             count = db.delete("catalog", where, whereArgs);
             count2 = db.delete("books", where, whereArgs);
@@ -418,8 +441,17 @@ public class VeaderProvider extends ContentProvider {
         sNotesProjectionMap.put(BookColumn.LAST_PAGE, BookColumn.LAST_PAGE);
         sNotesProjectionMap.put(BookColumn.CREATE_DATE, BookColumn.CREATE_DATE);
         sNotesProjectionMap.put(BookColumn.FORMAT, BookColumn.FORMAT);
-        
+        sBookmarkMap = new HashMap<String, String>();
+        sBookmarkMap.put(BookmarkColumn._ID, BookmarkColumn._ID);
+        sBookmarkMap.put(BookmarkColumn.NAME, BookmarkColumn.NAME);
+        sBookmarkMap.put(BookmarkColumn.DESCRIPTION, BookmarkColumn.DESCRIPTION);
+        sBookmarkMap.put(BookmarkColumn.CHAPTER, BookmarkColumn.CHAPTER);
+        sBookmarkMap.put(BookmarkColumn.PAGE, BookmarkColumn.PAGE);
+        sBookmarkMap.put(BookmarkColumn.TOTALPAGE, BookmarkColumn.TOTALPAGE);
+        sBookmarkMap.put(BookmarkColumn.CREATEDATE, BookmarkColumn.CREATEDATE);
+        sBookmarkMap.put(BookmarkColumn.BOOKID, BookmarkColumn.BOOKID);
         sCatalogMap = new HashMap<String, String>();
+        
         sCatalogMap.put(CatalogColumn._ID, CatalogColumn._ID);
         sCatalogMap.put(CatalogColumn.NAME, CatalogColumn.NAME);
         sCatalogMap.put(CatalogColumn.DESCRIPTION, CatalogColumn.DESCRIPTION);

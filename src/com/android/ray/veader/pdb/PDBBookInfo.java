@@ -2,6 +2,7 @@ package com.android.ray.veader.pdb;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import org.WeaselReader.PalmIO.PalmDocDB;
 
@@ -47,7 +48,7 @@ public class PDBBookInfo extends AbstractBookInfo {
         mName = new String(nameByte, mEncode).replace('_',' ').trim();
 
         mCount = channel.map(MapMode.READ_ONLY, 76, 2).asCharBuffer().get();
-
+Log.d("mCount", String.valueOf(mCount));
         int offset = 78;
         mRecodeOffset = new int[mCount];
         for (int i = 0; i < mCount; i++) {
@@ -146,6 +147,7 @@ public class PDBBookInfo extends AbstractBookInfo {
     public String getPalmDoc() throws IOException, DataFormatException {
         PalmDocDB palmDoc = new PalmDocDB(mFile,mEncode);
         mCount = palmDoc.getNumDataRecords();
+        Log.d("getpalmdoc, page:",String.valueOf(mPage) );
         String result = palmDoc.readTextRecord(mPage);
         palmDoc.close();
         return result;
