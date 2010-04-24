@@ -51,96 +51,6 @@ import java.io.File;
 
 public class BookListActivity extends ListActivity {
 
-    private static final String TAG = "BookListActivity";
-    private static final int ENCODE_DIALOG = 0;
-    private static final int PROGRESS_DIALOG = 1;
-    private static final int EXPIRED_DIALOG = 2;
-    private static final int MENU_DIALOG = 3;
-    private static final int SORT_DIALOG = 4;
-    private static final int EDIT_DIALOG = 5;
-    private static final int ABOUT_DIALOG = 6;
-    private static final int SYNC_DIALOG = 7;
-    private static final int CATALOG_DIALOG = 8;
-    private int selectedIndex;
-
-    private static final int SORT_NAME = 0;
-    private static final int SORT_AUTHOR = 1;
-    private static final int SORT_RECENT = 2;
-    private static final int SORT_PATH = 3;
-
-
-    private int sortMode;
-    private BooksListAdapter mAdapter;
-    private EditText mFilterText;
-    private static final String[] BookField = new String[] {
-            BookColumn._ID, BookColumn.NAME, BookColumn.AUTHOR,
-            BookColumn.ENDCODE, BookColumn.PATH, BookColumn.RATING};
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.books_list);
-        //setContentView(R.layout.vertical );
-
-        ListView list = (ListView) findViewById(android.R.id.list);
-
-
-        // Query for people
-        Cursor cursor = managedQuery(BookColumn.CONTENT_URI, BookField, null,
-                null, null);
-
-        mAdapter = new BooksListAdapter(this, R.layout.books_list_item, cursor);
-        list.setAdapter(mAdapter);
-        list.setOnItemClickListener(mAdapter);
-        list.setOnItemLongClickListener(mAdapter);
-
-        // if (!CheckUtil.checkAvailiable()) {
-        // showDialog(EXPIRED_DIALOG);
-        // }
-
-        SharedPreferences pref = getSharedPreferences(Constatnts.PREF_TAG,
-                Context.MODE_PRIVATE);
-        sortMode = pref.getInt("SORT_MODE", SORT_NAME);
-
-        mFilterText = (EditText) findViewById(R.id.search);
-        mFilterText.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable editable) {
-                mAdapter.getFilter().filter(editable.toString());
-            }
-
-            public void beforeTextChanged(CharSequence charsequence, int i,
-                    int j, int k) {
-            }
-
-            public void onTextChanged(CharSequence charsequence, int i, int j,
-                    int k) {
-            }
-        });
-    }
-
-    protected void onResume(){
-        super.onResume();
-        SDCardUtil.addListener(this);
-    }
-    
-    protected void onPause(){
-        super.onResume();
-        SDCardUtil.removeListener(this);
-    }
-    
-    
-    //@override
-    protected void onDestroy() {
-        super.onDestroy();
-        SharedPreferences pref = getSharedPreferences(Constatnts.PREF_TAG,
-                Context.MODE_PRIVATE);
-        Editor edit = pref.edit();
-        edit.putInt("SORT_MODE", SORT_NAME);
-        edit.commit();
-    }
-
     public class BooksListAdapter extends ResourceCursorAdapter implements
             OnItemClickListener, OnItemLongClickListener {
 
@@ -234,6 +144,30 @@ public class BookListActivity extends ListActivity {
         }
 
         //@override
+        public void onItemClick(AdapterView<?> parent, View view, int position,
+                long id) {
+            getCursor().moveToPosition(position);
+            Intent intent = new Intent();
+            long itemID = getItemId(position);
+            intent.putExtra("ID", itemID);
+            intent.setClassName(BookListActivity.this,
+                    PalmBookReaderActivity.class.getName());
+            startActivity(intent);
+
+        }
+
+
+        //@override
+        public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+                int position, long arg3) {
+            selectedIndex = position;
+            showDialog(MENU_DIALOG);
+            return true;
+        }
+
+
+
+        //@override
         public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
             if (getFilterQueryProvider() != null) {
                 return getFilterQueryProvider().runQuery(constraint);
@@ -271,76 +205,89 @@ public class BookListActivity extends ListActivity {
 
             return cursor;
         }
-
-
-        //@override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                long id) {
-            getCursor().moveToPosition(position);
-            Intent intent = new Intent();
-            long itemID = getItemId(position);
-            intent.putExtra("ID", itemID);
-            intent.setClassName(BookListActivity.this,
-                    PalmBookReaderActivity.class.getName());
-            startActivity(intent);
-
-        }
-
-
-
-        //@override
-        public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                int position, long arg3) {
-            selectedIndex = position;
-            showDialog(MENU_DIALOG);
-            return true;
-        }
     }
+    private static final String TAG = "BookListActivity";
+    private static final int ENCODE_DIALOG = 0;
+    private static final int PROGRESS_DIALOG = 1;
+    private static final int EXPIRED_DIALOG = 2;
+    private static final int MENU_DIALOG = 3;
+    private static final int SORT_DIALOG = 4;
+    private static final int EDIT_DIALOG = 5;
+    private static final int ABOUT_DIALOG = 6;
+    private static final int SYNC_DIALOG = 7;
+    private static final int CATALOG_DIALOG = 8;
+
+    private int selectedIndex;
+    private static final int SORT_NAME = 0;
+    private static final int SORT_AUTHOR = 1;
+    private static final int SORT_RECENT = 2;
 
 
+    private static final int SORT_PATH = 3;
+    private int sortMode;
+    private BooksListAdapter mAdapter;
+    private EditText mFilterText;
+
+
+    private static final String[] BookField = new String[] {
+            BookColumn._ID, BookColumn.NAME, BookColumn.AUTHOR,
+            BookColumn.ENDCODE, BookColumn.PATH, BookColumn.RATING};
 
     /* ---------------------menu---------------------------- */
     private final int MENU_SYCN = 0;
+    
     private final int MENU_CHARSET = 1;
+    
+    
     private final int MENU_SORT = 2;
+
     private final int MENU_ABOUT = 3;
+
+
+
     private final int MENU_CATALOG = 4;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.books_list);
+        //setContentView(R.layout.vertical );
 
-    //@override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_SYCN, MENU_SYCN, R.string.menu_sync);
-        menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
-        menu.add(0, MENU_SORT, MENU_SORT, R.string.menu_sort);
-        menu.add(0, MENU_ABOUT, MENU_ABOUT, R.string.menu_about);
-        menu.add(0, MENU_CATALOG, MENU_CATALOG, R.string.menu_catalog);
+        ListView list = (ListView) findViewById(android.R.id.list);
 
-        return true;
+
+        // Query for people
+        Cursor cursor = managedQuery(BookColumn.CONTENT_URI, BookField, null,
+                null, null);
+
+        mAdapter = new BooksListAdapter(this, R.layout.books_list_item, cursor);
+        list.setAdapter(mAdapter);
+        list.setOnItemClickListener(mAdapter);
+        list.setOnItemLongClickListener(mAdapter);
+
+        // if (!CheckUtil.checkAvailiable()) {
+        // showDialog(EXPIRED_DIALOG);
+        // }
+
+        SharedPreferences pref = getSharedPreferences(Constatnts.PREF_TAG,
+                Context.MODE_PRIVATE);
+        sortMode = pref.getInt("SORT_MODE", SORT_NAME);
+
+        mFilterText = (EditText) findViewById(R.id.search);
+        mFilterText.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable editable) {
+                mAdapter.getFilter().filter(editable.toString());
+            }
+
+            public void beforeTextChanged(CharSequence charsequence, int i,
+                    int j, int k) {
+            }
+
+            public void onTextChanged(CharSequence charsequence, int i, int j,
+                    int k) {
+            }
+        });
     }
-
-    //@override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(MENU_SYCN);
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    //@override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        if (item.getItemId() == MENU_SYCN) {
-            showDialog(SYNC_DIALOG);
-        } else if (item.getItemId() == MENU_CHARSET) {
-            showDialog(ENCODE_DIALOG);
-        } else if (item.getItemId() == MENU_SORT) {
-            showDialog(SORT_DIALOG);
-        } else if (item.getItemId() == MENU_ABOUT) {
-            showDialog(ABOUT_DIALOG);
-        }else if (item.getItemId() == MENU_CATALOG) {
-            showDialog(CATALOG_DIALOG);
-        }
-
-        return true;
-    }
-
-
     //@override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -534,6 +481,47 @@ public class BookListActivity extends ListActivity {
         }
         return null;
     }
+    //@override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_SYCN, MENU_SYCN, R.string.menu_sync);
+        menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
+        menu.add(0, MENU_SORT, MENU_SORT, R.string.menu_sort);
+        menu.add(0, MENU_ABOUT, MENU_ABOUT, R.string.menu_about);
+        menu.add(0, MENU_CATALOG, MENU_CATALOG, R.string.menu_catalog);
+
+        return true;
+    }
+    //@override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences pref = getSharedPreferences(Constatnts.PREF_TAG,
+                Context.MODE_PRIVATE);
+        Editor edit = pref.edit();
+        edit.putInt("SORT_MODE", SORT_NAME);
+        edit.commit();
+    }
+
+    //@override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == MENU_SYCN) {
+            showDialog(SYNC_DIALOG);
+        } else if (item.getItemId() == MENU_CHARSET) {
+            showDialog(ENCODE_DIALOG);
+        } else if (item.getItemId() == MENU_SORT) {
+            showDialog(SORT_DIALOG);
+        } else if (item.getItemId() == MENU_ABOUT) {
+            showDialog(ABOUT_DIALOG);
+        }else if (item.getItemId() == MENU_CATALOG) {
+            showDialog(CATALOG_DIALOG);
+        }
+
+        return true;
+    }
+
+    protected void onPause(){
+        super.onResume();
+        SDCardUtil.removeListener(this);
+    }
 
     protected void onPrepareDialog(int id, Dialog dialog) {
         switch (id) {
@@ -558,6 +546,18 @@ public class BookListActivity extends ListActivity {
             break;
         }
 
+    }
+
+
+    //@override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.getItem(MENU_SYCN);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    protected void onResume(){
+        super.onResume();
+        SDCardUtil.addListener(this);
     }
 
 

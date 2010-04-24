@@ -9,21 +9,22 @@ public class MyApplication extends Application {
    
    private DataHelper dataHelper;   
    
+   public DataHelper getDataHelper() {
+      return this.dataHelper;
+   }
+   
    @Override
    public void onCreate() {
       super.onCreate();
+      
       //Log.d(APP_NAME, "APPLICATION onCreate");
       this.dataHelper = new DataHelper(this);      
    }
-   
+
    @Override
    public void onTerminate() {
       Log.d(APP_NAME, "APPLICATION onTerminate");      
       super.onTerminate();      
-   }
-
-   public DataHelper getDataHelper() {
-      return this.dataHelper;
    }
 
    public void setDataHelper(DataHelper dataHelper) {

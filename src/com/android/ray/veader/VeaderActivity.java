@@ -15,6 +15,7 @@ import com.android.ray.veader.R;
 import com.android.ray.veader.SimpleGestureFilter.SimpleGestureListener;
 import com.android.ray.veader.pdb.AbstractBookInfo;
 import com.android.ray.veader.provider.BookColumn;
+import com.android.ray.veader.provider.BookmarkColumn;
 import com.android.ray.veader.util.ColorUtil;
 import com.android.ray.veader.util.Constatnts;
 
@@ -66,6 +67,363 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class VeaderActivity extends Activity implements SimpleGestureListener {
 
+	final class DemoJavaScriptInterface {
+
+		DemoJavaScriptInterface() {
+		}
+
+		/**
+		 * This is not called on the UI thread. Post a runnable to invoke
+		 * loadUrl on the UI thread.
+		 */
+		public void clickOnAndroid() {
+			mHandler.post(new Runnable() {
+				public void run() {
+					mWebView.loadUrl("javascript:settext("
+							+ "約莫有六尺左右的身材，他那麼挺直的立著" + ");");
+				}
+			});
+
+		}
+	}
+	private class loadContentTask extends AsyncTask<CharSequence, Void, String> {
+		private final ProgressDialog dialog = new ProgressDialog(
+				VeaderActivity.this);
+
+		// automatically done on worker thread (separate from UI thread)
+		protected String doInBackground(final CharSequence... args) {
+			// List<String> names =
+			// VeaderActivity.this.application.getDataHelper().selectAll();
+			String paramTxt = args[0].toString();
+			int pos;
+			if (args.length == 1) {
+				pos = 0;
+			} else {
+				pos = Integer.parseInt(args[1].toString());
+			}
+			// paramTxt = this.wrap(paramTxt, 27, null, true);
+		//	Log.d("settextactivity", paramTxt);
+			VeaderActivity.this.settext(args[0]);
+
+			return "";
+		}
+
+		// can use UI thread here
+		protected void onPostExecute(final String result) {
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
+			}
+			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
+					+ mBook.getPageCount());
+	
+		}
+
+		// can use UI thread here
+		protected void onPreExecute() {
+			this.dialog.setMessage("Loading...");
+			this.dialog.show();
+		}
+
+		public String wrap(String str, int wrapLength, String newLineStr,
+				boolean wrapLongWords) {
+			if (str == null) {
+				return null;
+			}
+			if (newLineStr == null) {
+				newLineStr = "\n";
+			}
+			if (wrapLength < 1) {
+				wrapLength = 1;
+			}
+			int inputLineLength = str.length();
+			int offset = 0;
+			StringBuffer wrappedLine = new StringBuffer(inputLineLength + 32);
+
+			while ((inputLineLength - offset) > wrapLength) {
+				if (str.charAt(offset) == ' ') {
+					offset++;
+					continue;
+				}
+				int spaceToWrapAt = str.lastIndexOf(' ', wrapLength + offset);
+
+				if (spaceToWrapAt >= offset) {
+					// normal case
+					wrappedLine.append(str.substring(offset, spaceToWrapAt));
+					wrappedLine.append(newLineStr);
+					offset = spaceToWrapAt + 1;
+
+				} else {
+					// really long word or URL
+					if (wrapLongWords) {
+						// wrap really long word one line at a time
+						wrappedLine.append(str.substring(offset, wrapLength
+								+ offset));
+						wrappedLine.append(newLineStr);
+						offset += wrapLength;
+					} else {
+						// do not wrap really long word, just extend beyond
+						// limit
+						spaceToWrapAt = str.indexOf(' ', wrapLength + offset);
+						if (spaceToWrapAt >= 0) {
+							wrappedLine.append(str.substring(offset,
+									spaceToWrapAt));
+							wrappedLine.append(newLineStr);
+							offset = spaceToWrapAt + 1;
+						} else {
+							wrappedLine.append(str.substring(offset));
+							offset = inputLineLength;
+						}
+					}
+				}
+			}
+
+			// Whatever is left in line is short enough to just pass through
+			wrappedLine.append(str.substring(offset));
+
+			return wrappedLine.toString();
+		}
+
+	}
+	private class loadContentTaskLast extends
+			AsyncTask<CharSequence, Void, String> {
+		private final ProgressDialog dialog = new ProgressDialog(
+				VeaderActivity.this);
+
+		// automatically done on worker thread (separate from UI thread)
+		protected String doInBackground(final CharSequence... args) {
+			// List<String> names =
+	
+			String paramTxt = args[0].toString();
+			// paramTxt = this.wrap(paramTxt, 27, null, true);
+			//Log.d("settextactivity", paramTxt);
+			VeaderActivity.this.settext(args[0], 100);
+
+			return "";
+		}
+
+		// can use UI thread here
+		protected void onPostExecute(final String result) {
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
+			}
+			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
+					+ mBook.getPageCount());
+		
+		}
+
+		// can use UI thread here
+		protected void onPreExecute() {
+			this.dialog.setMessage("Loading...");
+			this.dialog.show();
+		}
+
+	}
+	private class menuVeaderActivity extends Dialog{
+		//private ArrayList<_menuItem> _menulist = null;
+		//private menuAdapter mAdapter;
+		Context ctx;
+		private long totalPage;
+		private long currentPage;
+		private int selectedPage;
+		 private TextView txtpageno;
+	    public menuVeaderActivity(Context context) {
+	    	
+	        super(context);
+	        ctx = context;
+	        this.totalPage = VeaderActivity.this.totalPage;
+	        this.currentPage  = VeaderActivity.this.pageno;
+	    }
+	   
+	    //@override
+
+	    //@override
+	    protected void onCreate(Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	        
+	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+	        
+	        setContentView(R.layout.gotopage);
+	        setCancelable(true);
+	        setCanceledOnTouchOutside(true);
+	        
+
+
+	        
+	        SeekBar seek = (SeekBar)findViewById(R.id.page_seek);
+	         txtpageno = (TextView)findViewById(R.id.txtpageno);
+	        
+	        seek.setMax((int)totalPage-1);
+	        
+	        txtpageno.setText(String.valueOf(VeaderActivity.this.pageno) +"/"+String.valueOf(VeaderActivity.this.totalPage));
+	       // int ib = Settings.System.getInt(getContext().getContentResolver(),
+	       //         Settings.System.SCREEN_BRIGHTNESS,100); 
+	        
+	       // seek.setProgress(ctx.);
+	   	 Button btnGoto = (Button) findViewById(R.id.btngotopage);
+
+	    	btnGoto.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+//VeaderActivity.this.debug("xxxx");
+String jsCmd = "javascript:SimpleReader.goto("+String.valueOf(menuVeaderActivity.this.selectedPage)+");";
+Log.d("jscommand", jsCmd);
+VeaderActivity.this.mWebView.loadUrl(jsCmd);
+					Log.d("onclick!", "");
+				}
+			});
+	        
+	        seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+
+	            //@override
+	            public void onProgressChanged(SeekBar seekbar, int i, boolean flag) {
+	                /*
+	                WindowManager.LayoutParams lp = getOwnerActivity().getWindow().getAttributes();
+	                lp.screenBrightness = Math.max(5,i)/255f;
+	                getOwnerActivity().getWindow().setAttributes(lp);*/
+	            	menuVeaderActivity.this.selectedPage = (i==0)?1:i;
+	            	int seekpos =menuVeaderActivity.this.selectedPage;
+	            	Log.d("seekpos", String.valueOf(menuVeaderActivity.this.selectedPage));
+	            	if(seekpos==(VeaderActivity.this.totalPage-1))
+	            		VeaderActivity.this.previousPage = VeaderActivity.this.totalPage-1;
+	            	menuVeaderActivity.this. txtpageno.setText(String.valueOf(seekpos+1) +"/"+String.valueOf(VeaderActivity.this.totalPage));
+	        	    
+	            }
+
+	            //@override
+	            public void onStartTrackingTouch(SeekBar seekbar) {
+	              
+	            }
+
+	            //@override
+	            public void onStopTrackingTouch(SeekBar seekbar) {
+	                
+	            }
+	            
+	        });
+	        //end seek bar onlist
+	    
+	        
+	        
+	    }
+	    
+
+	    
+
+
+	}
+	private class MyGestureDetector extends SimpleOnGestureListener {
+		private static final int SWIPE_MIN_DISTANCE = 120;
+		private static final int SWIPE_MAX_OFF_PATH = 250;
+		private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+		public boolean nextPage() {
+			Log.d("dnxt page", "nxt page");
+			if (isLastChapterLastPage) {
+				Log.d("loadnx chapter", "yes");
+				VeaderActivity.this.nextChapter();
+			} else {
+				Log.d("loadnx chapter", "no");
+				mWebView.loadUrl("javascript:SimpleReader.next(1);");
+			}
+			return true;
+		}
+
+		@Override
+		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+				float velocityY) {
+			try {
+				if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+					return false;
+
+				// right to left swipe
+				if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					// this.nextPage();
+					// mWebView.loadUrl("javascript:previousPage();");
+					this.previousPage();
+				} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+					// debug("left to right");
+					// this.previousPage();
+					nextPage();
+
+				}
+			} catch (Exception e) {
+				// nothing
+			}
+			return false;
+		}
+
+		public void onLongPress(android.view.MotionEvent e) {
+
+			// debug("hi");
+			Log.d("longpress", Integer.toString(diag_Menu));
+			showDialog(diag_Menu);
+		}
+
+		public boolean previousPage() {
+			Log.d("previous page", "previous page");
+			mWebView.loadUrl("javascript:SimpleReader.prev(1);");
+			return true;
+		}
+	}
+	final class MyWebChromeClient extends WebChromeClient {
+		@Override
+		public boolean onJsAlert(WebView view, String url, String message,
+				JsResult result) {
+			Log.d(LOG_TAG, message);
+			
+			String[] msg = message.toString().split(":");
+			if (msg[0].compareTo("percent") == 0) {
+				percent = msg[1];
+				Log.d("percent:", percent);
+				if (Integer.parseInt(msg[1]) == 0)
+					previousChapter(100);
+				if (Integer.parseInt(msg[1]) == 100) {
+					// nextPage();
+					VeaderActivity.this.isLastChapterLastPage = true;
+				} else {
+					VeaderActivity.this.isLastChapterLastPage = false;
+				}
+				if((VeaderActivity.this.previousPage ==VeaderActivity.this.totalPage )
+						&&(percent.equals("100"))){
+						 nextChapter();
+					}
+					
+			}
+			if (msg[0].compareTo("pagecount") == 0)
+			{
+				txtbottomcenter.setText("P." + msg[1]);
+			try {
+				VeaderActivity.this.previousPage =VeaderActivity.this.pageno; 
+				VeaderActivity.this.pageno =Integer.parseInt( msg[1].split("/")[0]);
+				if(msg[1].split("/").length>1){
+					VeaderActivity.this.totalPage =Integer.parseInt( msg[1].split("/")[1]);
+				}
+				else
+				{
+					VeaderActivity.this.totalPage = 1;
+				}
+				Log.d("pageno", String.valueOf(VeaderActivity.this.pageno));
+				Log.d("totalpageno", String.valueOf(VeaderActivity.this.totalPage));
+				
+				if (Integer.parseInt(msg[1].split("/")[0]) == 0) {
+					Log.d("msg[1]??" , msg[1]);
+					Log.d("msg[1].split('/')[0]?" , msg[1].split("/")[0]);
+					previousChapter(100);
+				}
+				VeaderActivity.this.currentChapter = Integer.parseInt(msg[1]
+						.split("/")[0]);
+				VeaderActivity.this.updateCurrentPage();
+			} catch (Exception e) {
+				debug(e.getMessage());
+
+			}
+			}
+			result.confirm();
+			return true;
+		}
+
+	}
 	private static final String LOG_TAG = "WebViewDemo";
 	private String percent;
 	private WebView mWebView;
@@ -79,14 +437,45 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 	private static final int REQUEST_COLOR = 0x123;
 	private int mPage;
 	private long previousPage;
-	private ZoomControls zoomControl;
+private ZoomControls zoomControl;
 	private AbstractBookInfo mBook;
+
 	private SimpleGestureFilter filter;
+
 	private GestureDetector gestureDetector;
+
 	View.OnTouchListener gestureListener;
+
 	private Handler pHandler;
-private int totalPage;
+
+	private int totalPage;
+
 	protected int lastOffset;
+
+	protected boolean isLastChapterLastPage;
+
+	/* ---------------------menu---------------------------- */
+	private static final int MENU_ZOOM = 0;
+
+	private static final int MENU_COLOR = 1;
+	private static final int MENU_CHARSET = 2;
+	private static final int MENU_ROTATAION = 3;
+
+	private static final int MENU_FORMAT = 4;
+
+	private static final int MENU_LIB = 5;
+
+	private static final int MENU_BOOKMARK = 6;
+	
+	private static final int ENCODE_DIALOG = 3;
+
+	private static final int FORMAT_DIALOG = 1;
+
+	private static final int BRIGHTNESS_DIALOG = 2;
+
+	private static final int diag_Menu = 0;
+
+	private static final int diag_goto = 4;
 
 	public void debug(String msg) {
 
@@ -94,6 +483,126 @@ private int totalPage;
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent me) {
+		this.filter.onTouchEvent(me);
+		return super.dispatchTouchEvent(me);
+	}
+	/*
+	 * private Runnable returnRes = new Runnable() {
+	 * 
+	 * @Override public void run() { try {
+	 * 
+	 * String txt = (String)mBook.getText().subSequence(0, 300); //debug(txt);
+	 * Log.d("Returnres", txt); VeaderActivity.this.settext(txt); } catch
+	 * (Exception e) { // TODO Auto-generated catch block e.printStackTrace(); }
+	 * }//runOnUiThread(returnRes); };
+	 */
+	private void doShow(final int offset) {
+		showProgressBarVisibility(true);
+		// mBody.setText("");
+
+		pHandler.post(new Runnable() {
+			public void run() {
+
+				try {
+					mBook.nextPage();
+					final CharSequence txt = mBook.getText();
+					Log.d("do show", (String) txt);
+					// debug((String) txt);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							try {
+								// mBody.setText(txt);
+								// new loadContentTask().execute((String)txt);
+								// mWebView.loadUrl("javascript:settext('" +txt
+								// + "');");
+								//VeaderActivity.this.settext(txt);
+								new loadContentTask().execute(txt, "0");
+								if (offset > 0) {
+									new Handler().postDelayed(new Runnable() {
+										public void run() {
+											/*
+											 * int line = mBody.getLayout()
+											 * .getLineForOffset(offset); int
+											 * scollY = topPanel.getHeight() +
+											 * line * mBody.getLineHeight();
+											 * scrollview.scrollTo(0, scollY);
+											 */
+										}
+									}, 50);
+								}
+								setPageTitle();
+							} finally {
+								showProgressBarVisibility(false);
+							}
+
+						}
+					});
+
+				} catch (Exception e) {
+					Log.d(TAG, e.getMessage(), e);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							showProgressBarVisibility(false);
+						}
+					});
+				}
+
+			}
+		});
+
+	}
+	public boolean insertBookmark(int i) {
+		Log.d("udpatebookmark", String.valueOf(VeaderActivity.this.currentChapter));
+				//Uri pdbUri = Uri.parse(BookmarkColumn.CONTENT_URI + "/" + mBook.mID);
+				ContentValues values = new ContentValues();
+				// values.put(BookmarkColumn.NAME, mBook.mName);
+				values.put(BookmarkColumn.PAGE , this.pageno );
+				values.put(BookmarkColumn.TOTALPAGE , this.totalPage );
+				values.put(BookmarkColumn.CHAPTER, mBook.mPage);
+				values.put(BookmarkColumn.NAME , mBook.getname());
+				values.put(BookmarkColumn.DESCRIPTION, mBook.getname());
+
+				
+				Uri result = getContentResolver().insert(BookmarkColumn.CONTENT_URI, values);
+				return true;
+			}
+	/**
+	 * Provides a hook for calling "alert" from javascript. Useful for debugging
+	 * your javascript.
+	 */
+
+	public boolean nextChapter() {
+		isLastChapterLastPage = false;
+		Log.d("fn!dnxt page", "nxt page");
+		// new loadContentTask().execute("向左");
+		// VeaderActivity.this.settext("向左");
+		Log.d("has next??", String.valueOf(mBook.hasNextPage()));
+		if (mBook.hasNextPage()) {
+			// mBody.setText("");
+			mBook.nextPage();
+			Log.d("dnxt page", "has page");
+			try {
+				final CharSequence txt = mBook.getText();
+				// debug (txt);
+				//Log.d("hasnext!!", (String) txt);
+				Log.d("hasnext!!", "");
+				String temp = txt.toString().replace("\n", ":br:");
+
+				// mWebView.loadUrl("javascript:settext('" +temp + "');");
+				// doShow(0);
+				new loadContentTask().execute(txt, "0");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		
+			// scrollview.scrollTo(0, 0);
+		}
+		return true;
+	}
 	@Override
 	public void onCreate(Bundle icicle) {
 		// gestureScanner = new GestureDetector(this);
@@ -227,565 +736,6 @@ private int totalPage;
 		
 
 	}
-
-	public final void showProgressBarVisibility(boolean visible) {
-		// findViewById(R.id.progress_read).setVisibility(visible ?
-		// View.VISIBLE:View.GONE);
-	}
-
-	private void setPageTitle() {
-
-		txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
-				+ mBook.getPageCount());
-
-	}
-
-	/*
-	 * private Runnable returnRes = new Runnable() {
-	 * 
-	 * @Override public void run() { try {
-	 * 
-	 * String txt = (String)mBook.getText().subSequence(0, 300); //debug(txt);
-	 * Log.d("Returnres", txt); VeaderActivity.this.settext(txt); } catch
-	 * (Exception e) { // TODO Auto-generated catch block e.printStackTrace(); }
-	 * }//runOnUiThread(returnRes); };
-	 */
-	private void doShow(final int offset) {
-		showProgressBarVisibility(true);
-		// mBody.setText("");
-
-		pHandler.post(new Runnable() {
-			public void run() {
-
-				try {
-					mBook.nextPage();
-					final CharSequence txt = mBook.getText();
-					Log.d("do show", (String) txt);
-					// debug((String) txt);
-					runOnUiThread(new Runnable() {
-						public void run() {
-							try {
-								// mBody.setText(txt);
-								// new loadContentTask().execute((String)txt);
-								// mWebView.loadUrl("javascript:settext('" +txt
-								// + "');");
-								//VeaderActivity.this.settext(txt);
-								new loadContentTask().execute(txt, "0");
-								if (offset > 0) {
-									new Handler().postDelayed(new Runnable() {
-										public void run() {
-											/*
-											 * int line = mBody.getLayout()
-											 * .getLineForOffset(offset); int
-											 * scollY = topPanel.getHeight() +
-											 * line * mBody.getLineHeight();
-											 * scrollview.scrollTo(0, scollY);
-											 */
-										}
-									}, 50);
-								}
-								setPageTitle();
-							} finally {
-								showProgressBarVisibility(false);
-							}
-
-						}
-					});
-
-				} catch (Exception e) {
-					Log.d(TAG, e.getMessage(), e);
-					runOnUiThread(new Runnable() {
-						public void run() {
-							showProgressBarVisibility(false);
-						}
-					});
-				}
-
-			}
-		});
-
-	}
-
-	final void settext(CharSequence strtxt) {
-		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
-				"\n\n");
-		mWebView.loadUrl("javascript:settext('"
-				+ strParam.toString().replace("\n", ":br:") + "',0);");
-
-	}
-
-	final void settext(CharSequence strtxt, int pos) {
-		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
-				"\n\n");
-		mWebView.loadUrl("javascript:settext('"
-				+ strParam.toString().replace("\n", ":br:") + "',100);");
-
-	}
-
-	private class MyGestureDetector extends SimpleOnGestureListener {
-		private static final int SWIPE_MIN_DISTANCE = 120;
-		private static final int SWIPE_MAX_OFF_PATH = 250;
-		private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-
-		@Override
-		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-				float velocityY) {
-			try {
-				if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-					return false;
-
-				// right to left swipe
-				if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					// this.nextPage();
-					// mWebView.loadUrl("javascript:previousPage();");
-					this.previousPage();
-				} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					// debug("left to right");
-					// this.previousPage();
-					nextPage();
-
-				}
-			} catch (Exception e) {
-				// nothing
-			}
-			return false;
-		}
-
-		public void onLongPress(android.view.MotionEvent e) {
-
-			// debug("hi");
-			Log.d("longpress", Integer.toString(diag_Menu));
-			showDialog(diag_Menu);
-		}
-
-		public boolean nextPage() {
-			Log.d("dnxt page", "nxt page");
-			if (isLastChapterLastPage) {
-				Log.d("loadnx chapter", "yes");
-				VeaderActivity.this.nextChapter();
-			} else {
-				Log.d("loadnx chapter", "no");
-				mWebView.loadUrl("javascript:SimpleReader.next(1);");
-			}
-			return true;
-		}
-
-		public boolean previousPage() {
-			Log.d("previous page", "previous page");
-			mWebView.loadUrl("javascript:SimpleReader.prev(1);");
-			return true;
-		}
-	}
-
-	public boolean updateCurrentPage() {
-Log.d("updatecurrentpage", "");
-		Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
-		ContentValues values = new ContentValues();
-		// values.put(BookColumn.NAME, mBook.mName);
-		values.put(BookColumn.LAST_PAGE, mBook.mPage);
-		values.put(BookColumn.ENDCODE, mBook.mEncode);
-		values.put(BookColumn.FORMAT, mBook.mFormat);
-		values.put(BookColumn.LAST_OFFSET, VeaderActivity.this.currentChapter-1);
-
-		Long now = Long.valueOf(System.currentTimeMillis());
-		values.put(BookColumn.CREATE_DATE, now);
-
-		int result = getContentResolver().update(pdbUri, values, null, null);
-		return true;
-	}
-
-	final class DemoJavaScriptInterface {
-
-		DemoJavaScriptInterface() {
-		}
-
-		/**
-		 * This is not called on the UI thread. Post a runnable to invoke
-		 * loadUrl on the UI thread.
-		 */
-		public void clickOnAndroid() {
-			mHandler.post(new Runnable() {
-				public void run() {
-					mWebView.loadUrl("javascript:settext("
-							+ "約莫有六尺左右的身材，他那麼挺直的立著" + ");");
-				}
-			});
-
-		}
-	}
-
-	private class loadContentTask extends AsyncTask<CharSequence, Void, String> {
-		private final ProgressDialog dialog = new ProgressDialog(
-				VeaderActivity.this);
-
-		// can use UI thread here
-		protected void onPreExecute() {
-			this.dialog.setMessage("Loading...");
-			this.dialog.show();
-		}
-
-		// automatically done on worker thread (separate from UI thread)
-		protected String doInBackground(final CharSequence... args) {
-			// List<String> names =
-			// VeaderActivity.this.application.getDataHelper().selectAll();
-			String paramTxt = args[0].toString();
-			int pos;
-			if (args.length == 1) {
-				pos = 0;
-			} else {
-				pos = Integer.parseInt(args[1].toString());
-			}
-			// paramTxt = this.wrap(paramTxt, 27, null, true);
-		//	Log.d("settextactivity", paramTxt);
-			VeaderActivity.this.settext(args[0]);
-
-			return "";
-		}
-
-		public String wrap(String str, int wrapLength, String newLineStr,
-				boolean wrapLongWords) {
-			if (str == null) {
-				return null;
-			}
-			if (newLineStr == null) {
-				newLineStr = "\n";
-			}
-			if (wrapLength < 1) {
-				wrapLength = 1;
-			}
-			int inputLineLength = str.length();
-			int offset = 0;
-			StringBuffer wrappedLine = new StringBuffer(inputLineLength + 32);
-
-			while ((inputLineLength - offset) > wrapLength) {
-				if (str.charAt(offset) == ' ') {
-					offset++;
-					continue;
-				}
-				int spaceToWrapAt = str.lastIndexOf(' ', wrapLength + offset);
-
-				if (spaceToWrapAt >= offset) {
-					// normal case
-					wrappedLine.append(str.substring(offset, spaceToWrapAt));
-					wrappedLine.append(newLineStr);
-					offset = spaceToWrapAt + 1;
-
-				} else {
-					// really long word or URL
-					if (wrapLongWords) {
-						// wrap really long word one line at a time
-						wrappedLine.append(str.substring(offset, wrapLength
-								+ offset));
-						wrappedLine.append(newLineStr);
-						offset += wrapLength;
-					} else {
-						// do not wrap really long word, just extend beyond
-						// limit
-						spaceToWrapAt = str.indexOf(' ', wrapLength + offset);
-						if (spaceToWrapAt >= 0) {
-							wrappedLine.append(str.substring(offset,
-									spaceToWrapAt));
-							wrappedLine.append(newLineStr);
-							offset = spaceToWrapAt + 1;
-						} else {
-							wrappedLine.append(str.substring(offset));
-							offset = inputLineLength;
-						}
-					}
-				}
-			}
-
-			// Whatever is left in line is short enough to just pass through
-			wrappedLine.append(str.substring(offset));
-
-			return wrappedLine.toString();
-		}
-
-		// can use UI thread here
-		protected void onPostExecute(final String result) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
-			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
-					+ mBook.getPageCount());
-	
-		}
-
-	}
-
-	private class loadContentTaskLast extends
-			AsyncTask<CharSequence, Void, String> {
-		private final ProgressDialog dialog = new ProgressDialog(
-				VeaderActivity.this);
-
-		// can use UI thread here
-		protected void onPreExecute() {
-			this.dialog.setMessage("Loading...");
-			this.dialog.show();
-		}
-
-		// automatically done on worker thread (separate from UI thread)
-		protected String doInBackground(final CharSequence... args) {
-			// List<String> names =
-			// VeaderActivity.this.application.getDataHelper().selectAll();
-			String paramTxt = args[0].toString();
-			// paramTxt = this.wrap(paramTxt, 27, null, true);
-			//Log.d("settextactivity", paramTxt);
-			VeaderActivity.this.settext(args[0], 100);
-
-			return "";
-		}
-
-		// can use UI thread here
-		protected void onPostExecute(final String result) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
-			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
-					+ mBook.getPageCount());
-		
-		}
-
-	}
-
-	/**
-	 * Provides a hook for calling "alert" from javascript. Useful for debugging
-	 * your javascript.
-	 */
-
-	public boolean nextChapter() {
-		isLastChapterLastPage = false;
-		Log.d("fn!dnxt page", "nxt page");
-		// new loadContentTask().execute("向左");
-		// VeaderActivity.this.settext("向左");
-		Log.d("has next??", String.valueOf(mBook.hasNextPage()));
-		if (mBook.hasNextPage()) {
-			// mBody.setText("");
-			mBook.nextPage();
-			Log.d("dnxt page", "has page");
-			try {
-				final CharSequence txt = mBook.getText();
-				// debug (txt);
-				//Log.d("hasnext!!", (String) txt);
-				Log.d("hasnext!!", "");
-				String temp = txt.toString().replace("\n", ":br:");
-
-				// mWebView.loadUrl("javascript:settext('" +temp + "');");
-				// doShow(0);
-				new loadContentTask().execute(txt, "0");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		
-			// scrollview.scrollTo(0, 0);
-		}
-		return true;
-	}
-	
-	public boolean previousChapter(int pos) {
-		Log.d("fn!prev page", "prev page");
-		Log.d("has prev?", String.valueOf(mBook.hasPrevPage()));
-		// new loadContentTask().execute("向右");
-		// VeaderActivity.this.settext("向右");
-		Log.d("currentPage", String.valueOf(mBook.mPage));
-		if(currentChapter==0)return false;
-		if (mBook.hasPrevPage()) {
-			// mBody.setText("");
-			mBook.prevPage();
-			if (mBook.isProgressing()) {
-				mBook.stop();
-			}
-	
-			try {
-				final CharSequence txt = mBook.getText();
-				// debug (txt);
-				Log.d("hasnext!!", "");
-				String temp = txt.toString().replace("\n", ":br:");
-				if (pos == 100) {
-					new loadContentTaskLast()
-							.execute(temp, String.valueOf(pos));
-				} else {
-					new loadContentTask().execute(temp, String.valueOf(pos));
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-		return true;
-	}
-
-	final class MyWebChromeClient extends WebChromeClient {
-		@Override
-		public boolean onJsAlert(WebView view, String url, String message,
-				JsResult result) {
-			Log.d(LOG_TAG, message);
-			
-			String[] msg = message.toString().split(":");
-			if (msg[0].compareTo("percent") == 0) {
-				percent = msg[1];
-				Log.d("percent:", percent);
-				if (Integer.parseInt(msg[1]) == 0)
-					previousChapter(100);
-				if (Integer.parseInt(msg[1]) == 100) {
-					// nextPage();
-					VeaderActivity.this.isLastChapterLastPage = true;
-				} else {
-					VeaderActivity.this.isLastChapterLastPage = false;
-				}
-				if((VeaderActivity.this.previousPage ==VeaderActivity.this.totalPage )
-						&&(percent.equals("100"))){
-						 nextChapter();
-					}
-					
-			}
-			if (msg[0].compareTo("pagecount") == 0)
-			{
-				txtbottomcenter.setText("P." + msg[1]);
-			try {
-				VeaderActivity.this.previousPage =VeaderActivity.this.pageno; 
-				VeaderActivity.this.pageno =Integer.parseInt( msg[1].split("/")[0]);
-				if(msg[1].split("/").length>1){
-					VeaderActivity.this.totalPage =Integer.parseInt( msg[1].split("/")[1]);
-				}
-				else
-				{
-					VeaderActivity.this.totalPage = 1;
-				}
-				Log.d("pageno", String.valueOf(VeaderActivity.this.pageno));
-				Log.d("totalpageno", String.valueOf(VeaderActivity.this.totalPage));
-				
-				if (Integer.parseInt(msg[1].split("/")[0]) == 0) {
-					Log.d("msg[1]??" , msg[1]);
-					Log.d("msg[1].split('/')[0]?" , msg[1].split("/")[0]);
-					previousChapter(100);
-				}
-				VeaderActivity.this.currentChapter = Integer.parseInt(msg[1]
-						.split("/")[0]);
-				VeaderActivity.this.updateCurrentPage();
-			} catch (Exception e) {
-				debug(e.getMessage());
-
-			}
-			}
-			result.confirm();
-			return true;
-		}
-
-	}
-
-	protected boolean isLastChapterLastPage;
-
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent me) {
-		this.filter.onTouchEvent(me);
-		return super.dispatchTouchEvent(me);
-	}
-
-	@Override
-	public void onSwipe(int direction) {
-
-		switch (direction) {
-
-		case SimpleGestureFilter.SWIPE_RIGHT:
-			mWebView.loadUrl("javascript:settext(" + "約莫有六尺左右的身材，他那麼挺直的立著"
-					+ ");");
-
-			break;
-		case SimpleGestureFilter.SWIPE_LEFT:
-			mWebView.loadUrl("javascript:settext(" + "約莫有六尺左右的身材，他那麼挺直的立著"
-					+ ");");
-			break;
-		case SimpleGestureFilter.SWIPE_DOWN:
-		case SimpleGestureFilter.SWIPE_UP:
-
-		}
-	}
-
-	@Override
-	public void onDoubleTap() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* ---------------------menu---------------------------- */
-	private static final int MENU_ZOOM = 0;
-	private static final int MENU_COLOR = 1;
-	private static final int MENU_CHARSET = 2;
-	private static final int MENU_ROTATAION = 3;
-	private static final int MENU_FORMAT = 4;
-	private static final int MENU_LIB = 5;
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		//menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
-	//			R.string.menu_text_size));
-
-		//menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
-		//menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
-		menu.add(0, MENU_ROTATAION, MENU_ROTATAION, "");
-	//	menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
-		menu.add(0, MENU_LIB, MENU_LIB, R.string.menu_lib);
-		return true;
-
-	}
-
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		/*
-		MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION);
-		if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-			rotationIgtem.setTitle(R.string.menu_lock);
-		} else {
-			rotationIgtem.setTitle(R.string.menu_unlock);
-		}
-*/
-		//MenuItem formatItem = menu.getItem(MENU_FORMAT);
-		//formatItem.setEnabled(mBook.supportFormat());
-
-		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		if (item.getItemId() == MENU_ZOOM) {
-			zoomControl.show();
-		} else if (item.getItemId() == MENU_COLOR) {
-			Intent intent = new Intent(this, ColorListActivity.class);
-
-			startActivityForResult(intent, REQUEST_COLOR);
-			// scrollview.fullScroll(View.FOCUS_UP);
-			// mBody.moveCursorToVisibleOffset();
-		} else if (item.getItemId() == MENU_CHARSET) {
-			showDialog(ENCODE_DIALOG);
-		} else if (item.getItemId() == MENU_ROTATAION) {
-			if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);// .SCREEN_ORIENTATION_PORTRAIT);
-			} else {
-				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-			}
-		} else if (item.getItemId() == MENU_FORMAT) {
-			showDialog(FORMAT_DIALOG);
-		} else if (item.getItemId() == MENU_LIB) {
-			Intent intent = new Intent();
-
-			intent.setClassName(VeaderActivity.this, LibraryList.class
-					.getName());
-			startActivity(intent);
-		}
-
-		return true;
-	}
-
-	private static final int ENCODE_DIALOG = 3;
-	private static final int FORMAT_DIALOG = 1;
-	private static final int BRIGHTNESS_DIALOG = 2;
-	private static final int diag_Menu = 0;
-	private static final int diag_goto = 4;
 	// @override
 	protected Dialog onCreateDialog(int id) {
 Log.d("creatingdialog", Integer.toString(id));
@@ -795,7 +745,8 @@ Log.d("creatingdialog", Integer.toString(id));
 					getString(R.string.menu_next5),
 					getString(R.string.menu_previous5), 
 					getString(R.string.menu_nextchapter), 
-					getString(R.string.menu_previouschapter)
+					getString(R.string.menu_previouschapter), 
+					getString(R.string.menu_addbookmark)
 					};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -837,6 +788,9 @@ Log.d("creatingdialog", Integer.toString(id));
 			    		break;
 			    	case 4:
 			    		previousChapter(0);
+			    		break;
+			    	case 5:
+			    		insertBookmark(0);
 			    		break;
 			    	}
 			    	//dismissDialog  (diag_Menu);
@@ -912,97 +866,163 @@ Log.d("creatingdialog", Integer.toString(id));
 		}
 		return null;
 	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		//menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
+	//			R.string.menu_text_size));
 
-	private class menuVeaderActivity extends Dialog{
-		//private ArrayList<_menuItem> _menulist = null;
-		//private menuAdapter mAdapter;
-		Context ctx;
-		private long totalPage;
-		private long currentPage;
-		private int selectedPage;
-		 private TextView txtpageno;
-	    public menuVeaderActivity(Context context) {
-	    	
-	        super(context);
-	        ctx = context;
-	        this.totalPage = VeaderActivity.this.totalPage;
-	        this.currentPage  = VeaderActivity.this.pageno;
-	    }
-	   
-	    //@override
+		//menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
+		//menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
+		menu.add(0, MENU_ROTATAION, MENU_ROTATAION, "");
+	//	menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
+		menu.add(0, MENU_LIB, MENU_LIB, R.string.menu_lib);
+		//menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
+		return true;
 
-	    //@override
-	    protected void onCreate(Bundle savedInstanceState) {
-	        super.onCreate(savedInstanceState);
-	        
-	        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-	        
-	        setContentView(R.layout.gotopage);
-	        setCancelable(true);
-	        setCanceledOnTouchOutside(true);
-	        
+	}
+	@Override
+	public void onDoubleTap() {
+		// TODO Auto-generated method stub
 
+	}
 
-	        
-	        SeekBar seek = (SeekBar)findViewById(R.id.page_seek);
-	         txtpageno = (TextView)findViewById(R.id.txtpageno);
-	        
-	        seek.setMax((int)totalPage-1);
-	        
-	        txtpageno.setText(String.valueOf(VeaderActivity.this.pageno) +"/"+String.valueOf(VeaderActivity.this.totalPage));
-	       // int ib = Settings.System.getInt(getContext().getContentResolver(),
-	       //         Settings.System.SCREEN_BRIGHTNESS,100); 
-	        
-	       // seek.setProgress(ctx.);
-	   	 Button btnGoto = (Button) findViewById(R.id.btngotopage);
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		if (item.getItemId() == MENU_ZOOM) {
+			zoomControl.show();
+		} else if (item.getItemId() == MENU_COLOR) {
+			Intent intent = new Intent(this, ColorListActivity.class);
 
-	    	btnGoto.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v) {
-//VeaderActivity.this.debug("xxxx");
-String jsCmd = "javascript:SimpleReader.goto("+String.valueOf(menuVeaderActivity.this.selectedPage)+");";
-Log.d("jscommand", jsCmd);
-VeaderActivity.this.mWebView.loadUrl(jsCmd);
-					Log.d("onclick!", "");
+			startActivityForResult(intent, REQUEST_COLOR);
+			// scrollview.fullScroll(View.FOCUS_UP);
+			// mBody.moveCursorToVisibleOffset();
+		} else if (item.getItemId() == MENU_CHARSET) {
+			showDialog(ENCODE_DIALOG);
+		} else if (item.getItemId() == MENU_ROTATAION) {
+			if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);// .SCREEN_ORIENTATION_PORTRAIT);
+			} else {
+				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+			}
+		} else if (item.getItemId() == MENU_FORMAT) {
+			showDialog(FORMAT_DIALOG);
+		} else if (item.getItemId() == MENU_LIB) {
+			Intent intent = new Intent();
+
+			intent.setClassName(VeaderActivity.this, LibraryList.class
+					.getName());
+			startActivity(intent);
+		}
+
+		return true;
+	}
+
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		/*
+		MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION);
+		if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
+			rotationIgtem.setTitle(R.string.menu_lock);
+		} else {
+			rotationIgtem.setTitle(R.string.menu_unlock);
+		}
+*/
+		//MenuItem formatItem = menu.getItem(MENU_FORMAT);
+		//formatItem.setEnabled(mBook.supportFormat());
+
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public void onSwipe(int direction) {
+
+		switch (direction) {
+
+		case SimpleGestureFilter.SWIPE_RIGHT:
+			mWebView.loadUrl("javascript:settext(" + "約莫有六尺左右的身材，他那麼挺直的立著"
+					+ ");");
+
+			break;
+		case SimpleGestureFilter.SWIPE_LEFT:
+			mWebView.loadUrl("javascript:settext(" + "約莫有六尺左右的身材，他那麼挺直的立著"
+					+ ");");
+			break;
+		case SimpleGestureFilter.SWIPE_DOWN:
+		case SimpleGestureFilter.SWIPE_UP:
+
+		}
+	}
+	public boolean previousChapter(int pos) {
+		Log.d("fn!prev page", "prev page");
+		Log.d("has prev?", String.valueOf(mBook.hasPrevPage()));
+		// new loadContentTask().execute("向右");
+		// VeaderActivity.this.settext("向右");
+		Log.d("currentPage", String.valueOf(mBook.mPage));
+		if(currentChapter==0)return false;
+		if (mBook.hasPrevPage()) {
+			// mBody.setText("");
+			mBook.prevPage();
+			if (mBook.isProgressing()) {
+				mBook.stop();
+			}
+	
+			try {
+				final CharSequence txt = mBook.getText();
+				// debug (txt);
+				Log.d("hasnext!!", "");
+				String temp = txt.toString().replace("\n", ":br:");
+				if (pos == 100) {
+					new loadContentTaskLast()
+							.execute(temp, String.valueOf(pos));
+				} else {
+					new loadContentTask().execute(temp, String.valueOf(pos));
 				}
-			});
-	        
-	        seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-	            //@override
-	            public void onProgressChanged(SeekBar seekbar, int i, boolean flag) {
-	                /*
-	                WindowManager.LayoutParams lp = getOwnerActivity().getWindow().getAttributes();
-	                lp.screenBrightness = Math.max(5,i)/255f;
-	                getOwnerActivity().getWindow().setAttributes(lp);*/
-	            	menuVeaderActivity.this.selectedPage = (i==0)?1:i;
-	            	int seekpos =menuVeaderActivity.this.selectedPage;
-	            	Log.d("seekpos", String.valueOf(menuVeaderActivity.this.selectedPage));
-	            	if(seekpos==(VeaderActivity.this.totalPage-1))
-	            		VeaderActivity.this.previousPage = VeaderActivity.this.totalPage-1;
-	            	menuVeaderActivity.this. txtpageno.setText(String.valueOf(seekpos+1) +"/"+String.valueOf(VeaderActivity.this.totalPage));
-	        	    
-	            }
+		}
+		return true;
+	}
+	private void setPageTitle() {
 
-	            //@override
-	            public void onStartTrackingTouch(SeekBar seekbar) {
-	              
-	            }
+		txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
+				+ mBook.getPageCount());
 
-	            //@override
-	            public void onStopTrackingTouch(SeekBar seekbar) {
-	                
-	            }
-	            
-	        });
-	        //end seek bar onlist
-	    
-	        
-	        
-	    }
-	    
+	}
+	final void settext(CharSequence strtxt) {
+		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
+				"\n\n");
+		mWebView.loadUrl("javascript:settext('"
+				+ strParam.toString().replace("\n", ":br:") + "',0);");
 
-	    
+	}
+	final void settext(CharSequence strtxt, int pos) {
+		String strParam = strtxt.toString().replace("�D", "").replace("\n\n\n",
+				"\n\n");
+		mWebView.loadUrl("javascript:settext('"
+				+ strParam.toString().replace("\n", ":br:") + "',100);");
 
+	}
+	public final void showProgressBarVisibility(boolean visible) {
+		// findViewById(R.id.progress_read).setVisibility(visible ?
+		// View.VISIBLE:View.GONE);
+	}
 
+	public boolean updateCurrentPage() {
+Log.d("updatecurrentpage", "");
+		Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
+		ContentValues values = new ContentValues();
+		// values.put(BookColumn.NAME, mBook.mName);
+		values.put(BookColumn.LAST_PAGE, mBook.mPage);
+		values.put(BookColumn.ENDCODE, mBook.mEncode);
+		values.put(BookColumn.FORMAT, mBook.mFormat);
+		values.put(BookColumn.LAST_OFFSET, VeaderActivity.this.currentChapter-1);
+
+		Long now = Long.valueOf(System.currentTimeMillis());
+		values.put(BookColumn.CREATE_DATE, now);
+
+		int result = getContentResolver().update(pdbUri, values, null, null);
+		return true;
 	}
 }

@@ -57,6 +57,120 @@ public class PalmBookReaderActivity extends Activity implements
 
     private Handler pHandler;
 
+    /* ---------------------menu---------------------------- */
+    private static final int MENU_ZOOM = 0;
+
+    private static final int MENU_COLOR = 1;
+
+
+    private static final int MENU_CHARSET = 2;
+    private static final int MENU_ROTATAION = 3;
+    private static final int MENU_FORMAT = 4;
+    private static final int MENU_BRIGHTNESS = 5;
+    private static final int ENCODE_DIALOG = 0;
+    private static final int FORMAT_DIALOG = 1;
+
+    private static final int BRIGHTNESS_DIALOG = 2;
+
+    private void changeColor(int index) {
+        int[] color = colorUtil.getColor(index); // use pref
+        mBody.setTextColor(color[0]);
+        mBody.setBackgroundColor(color[1]);
+    }
+
+
+
+    private void doShow(final int offset) {
+        showProgressBarVisibility(true);
+        mBody.setText("");
+        pHandler.post(new Runnable() {
+            public void run() {
+                
+                try {
+                    final CharSequence txt = mBook.getText();
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                mBody.setText(txt);
+                                if (offset > 0) {
+                                    new Handler().postDelayed(new Runnable() {
+                                        public void run() {
+                                            int line = mBody.getLayout()
+                                                    .getLineForOffset(offset);
+                                            int scollY = topPanel.getHeight()
+                                                    + line * mBody.getLineHeight();
+                                            scrollview.scrollTo(0, scollY);
+                                        }
+                                    }, 50);
+                                }
+                                setPageTitle();
+                            }finally{
+                                showProgressBarVisibility(false);
+                            }
+                            
+                          
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Log.d(TAG, e.getMessage(), e);
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            showProgressBarVisibility(false);
+                        }
+                    });                  
+                }
+
+            }
+        });
+
+
+
+    }
+
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_COLOR && resultCode == Activity.RESULT_OK) {
+            int index = data.getIntExtra("DATA", -1);
+
+
+
+            changeColor(index);
+        }
+    }
+
+
+    //@override
+    public void onClick(View view) {
+        if (view.getId() == R.id.prev_button
+                || view.getId() == R.id.prev_button1) {
+            if (mBook.hasPrevPage()) {
+                mBody.setText("");
+                mBook.prevPage();
+                if (mBook.isProgressing()) {
+                    mBook.stop();
+                }
+                doShow(0);
+                if (mBottomNext.isFocusable()) {
+                    mBottomNext.setFocusable(false);
+                }
+                scrollview.scrollTo(0, 0);
+            }
+        } else if (view.getId() == R.id.next_button
+                || view.getId() == R.id.next_button1) {
+            if (mBook.hasNextPage()) {
+                mBody.setText("");
+                mBook.nextPage();
+                if (mBottomNext.isFocusable()) {
+                    mBottomNext.setFocusable(false);
+                }
+                doShow(0);
+                scrollview.scrollTo(0, 0);
+            }
+        }
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -225,216 +339,6 @@ public class PalmBookReaderActivity extends Activity implements
 
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-            int oldX = scrollview.getScrollY();
-            scrollview.scrollBy(0, (scrollview.getHeight() - mBody
-                    .getLineHeight()));
-
-
-            int newX = scrollview.getScrollY();
-
-
-            if (oldX == newX) {
-                mBottomNext.setFocusable(true);
-                mBottomNext.requestFocus();
-            }
-
-            return true;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-            if (mBottomNext.isFocusable()) {
-                mBottomNext.setFocusable(false);
-            }
-
-            scrollview.scrollBy(0, -(scrollview.getHeight() - mBody
-                    .getLineHeight()));
-            return true;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            if (mBottomNext.isFocusable()) {
-                mBottomNext.setFocusable(false);
-            }
-            scrollview.fullScroll(View.FOCUS_UP);
-            return true;
-        }
-
-
-        return super.onKeyDown(keyCode, event);
-    }
-
-
-    /* ---------------------menu---------------------------- */
-    private static final int MENU_ZOOM = 0;
-    private static final int MENU_COLOR = 1;
-    private static final int MENU_CHARSET = 2;
-    private static final int MENU_ROTATAION = 3;
-    private static final int MENU_FORMAT = 4;
-    private static final int MENU_BRIGHTNESS = 5;
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
-                R.string.menu_text_size));
-
-        menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
-        menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
-        menu.add(0, MENU_ROTATAION, MENU_ROTATAION, "");
-        menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
-        menu.add(0, MENU_BRIGHTNESS, MENU_BRIGHTNESS, R.string.menu_brightness);
-        return true;
-
-    }
-
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION);
-        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-            rotationIgtem.setTitle(R.string.menu_lock);
-        } else {
-            rotationIgtem.setTitle(R.string.menu_unlock);
-        }
-
-        MenuItem formatItem = menu.getItem(MENU_FORMAT);
-        formatItem.setEnabled(mBook.supportFormat());
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        if (item.getItemId() == MENU_ZOOM) {
-            zoomControl.show();
-        } else if (item.getItemId() == MENU_COLOR) {
-            Intent intent = new Intent(this, ColorListActivity.class);
-
-            startActivityForResult(intent, REQUEST_COLOR);
-            // scrollview.fullScroll(View.FOCUS_UP);
-            // mBody.moveCursorToVisibleOffset();
-        } else if (item.getItemId() == MENU_CHARSET) {
-            showDialog(ENCODE_DIALOG);
-        } else if (item.getItemId() == MENU_ROTATAION) {
-            if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);// .SCREEN_ORIENTATION_PORTRAIT);
-            } else {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-            }
-        } else if (item.getItemId() == MENU_FORMAT) {
-            showDialog(FORMAT_DIALOG);
-        } else if (item.getItemId() == MENU_BRIGHTNESS) {
-            showDialog(BRIGHTNESS_DIALOG);
-        }
-
-
-
-        return true;
-    }
-
-
-    private void setPageTitle() {
-        TextView pageview = (TextView) findViewById(R.id.page_index);
-        TextView pageview1 = (TextView) findViewById(R.id.page_index1);
-
-        pageview.setText((mBook.mPage + 1) + " of " + mBook.getPageCount());
-        pageview1.setText(pageview.getText());
-    }
-
-
-    private void doShow(final int offset) {
-        showProgressBarVisibility(true);
-        mBody.setText("");
-        pHandler.post(new Runnable() {
-            public void run() {
-                
-                try {
-                    final CharSequence txt = mBook.getText();
-
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            try {
-                                mBody.setText(txt);
-                                if (offset > 0) {
-                                    new Handler().postDelayed(new Runnable() {
-                                        public void run() {
-                                            int line = mBody.getLayout()
-                                                    .getLineForOffset(offset);
-                                            int scollY = topPanel.getHeight()
-                                                    + line * mBody.getLineHeight();
-                                            scrollview.scrollTo(0, scollY);
-                                        }
-                                    }, 50);
-                                }
-                                setPageTitle();
-                            }finally{
-                                showProgressBarVisibility(false);
-                            }
-                            
-                          
-                        }
-                    });
-
-                } catch (Exception e) {
-                    Log.d(TAG, e.getMessage(), e);
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            showProgressBarVisibility(false);
-                        }
-                    });                  
-                }
-
-            }
-        });
-
-
-
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_COLOR && resultCode == Activity.RESULT_OK) {
-            int index = data.getIntExtra("DATA", -1);
-
-
-
-            changeColor(index);
-        }
-    }
-
-
-    public final void showProgressBarVisibility(boolean visible) {
-        findViewById(R.id.progress_read).setVisibility(visible ? View.VISIBLE:View.GONE);
-    }
-    
-    
-    protected void onDestroy() {
-        int y = Math.max(0, scrollview.getScrollY() - topPanel.getHeight());
-        int line = y / mBody.getLineHeight();
-        int offset = mBody.getLayout().getLineStart(line);
-
-        Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
-        ContentValues values = new ContentValues();
-        // values.put(BookColumn.NAME, mBook.mName);
-        values.put(BookColumn.LAST_PAGE, mBook.mPage);
-        values.put(BookColumn.ENDCODE, mBook.mEncode);
-        values.put(BookColumn.FORMAT, mBook.mFormat);
-        values.put(BookColumn.LAST_OFFSET, offset);
-
-        Long now = Long.valueOf(System.currentTimeMillis());
-        values.put(BookColumn.CREATE_DATE, now);
-
-
-        int result = getContentResolver().update(pdbUri, values, null, null);
-        // if(result>0){
-        // Toast.makeText(this, R.string.msg_store, 2000).show();
-        // }
-
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        pHandler.getLooper().quit();
-        super.onDestroy();
-
-    }
-
-    private static final int ENCODE_DIALOG = 0;
-    private static final int FORMAT_DIALOG = 1;
-    private static final int BRIGHTNESS_DIALOG = 2;
 
     //@override
     protected Dialog onCreateDialog(int id) {
@@ -505,40 +409,136 @@ public class PalmBookReaderActivity extends Activity implements
         }
         return null;
     }
+    
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
+                R.string.menu_text_size));
 
-    private void changeColor(int index) {
-        int[] color = colorUtil.getColor(index); // use pref
-        mBody.setTextColor(color[0]);
-        mBody.setBackgroundColor(color[1]);
+        menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
+        menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
+        menu.add(0, MENU_ROTATAION, MENU_ROTATAION, "");
+        menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
+        menu.add(0, MENU_BRIGHTNESS, MENU_BRIGHTNESS, R.string.menu_brightness);
+        return true;
+
     }
 
-    //@override
-    public void onClick(View view) {
-        if (view.getId() == R.id.prev_button
-                || view.getId() == R.id.prev_button1) {
-            if (mBook.hasPrevPage()) {
-                mBody.setText("");
-                mBook.prevPage();
-                if (mBook.isProgressing()) {
-                    mBook.stop();
-                }
-                doShow(0);
-                if (mBottomNext.isFocusable()) {
-                    mBottomNext.setFocusable(false);
-                }
-                scrollview.scrollTo(0, 0);
+    protected void onDestroy() {
+        int y = Math.max(0, scrollview.getScrollY() - topPanel.getHeight());
+        int line = y / mBody.getLineHeight();
+        int offset = mBody.getLayout().getLineStart(line);
+
+        Uri pdbUri = Uri.parse(BookColumn.CONTENT_URI + "/" + mBook.mID);
+        ContentValues values = new ContentValues();
+        // values.put(BookColumn.NAME, mBook.mName);
+        values.put(BookColumn.LAST_PAGE, mBook.mPage);
+        values.put(BookColumn.ENDCODE, mBook.mEncode);
+        values.put(BookColumn.FORMAT, mBook.mFormat);
+        values.put(BookColumn.LAST_OFFSET, offset);
+
+        Long now = Long.valueOf(System.currentTimeMillis());
+        values.put(BookColumn.CREATE_DATE, now);
+
+
+        int result = getContentResolver().update(pdbUri, values, null, null);
+        // if(result>0){
+        // Toast.makeText(this, R.string.msg_store, 2000).show();
+        // }
+
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        pHandler.getLooper().quit();
+        super.onDestroy();
+
+    }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+            int oldX = scrollview.getScrollY();
+            scrollview.scrollBy(0, (scrollview.getHeight() - mBody
+                    .getLineHeight()));
+
+
+            int newX = scrollview.getScrollY();
+
+
+            if (oldX == newX) {
+                mBottomNext.setFocusable(true);
+                mBottomNext.requestFocus();
             }
-        } else if (view.getId() == R.id.next_button
-                || view.getId() == R.id.next_button1) {
-            if (mBook.hasNextPage()) {
-                mBody.setText("");
-                mBook.nextPage();
-                if (mBottomNext.isFocusable()) {
-                    mBottomNext.setFocusable(false);
-                }
-                doShow(0);
-                scrollview.scrollTo(0, 0);
+
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            if (mBottomNext.isFocusable()) {
+                mBottomNext.setFocusable(false);
             }
+
+            scrollview.scrollBy(0, -(scrollview.getHeight() - mBody
+                    .getLineHeight()));
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            if (mBottomNext.isFocusable()) {
+                mBottomNext.setFocusable(false);
+            }
+            scrollview.fullScroll(View.FOCUS_UP);
+            return true;
         }
+
+
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == MENU_ZOOM) {
+            zoomControl.show();
+        } else if (item.getItemId() == MENU_COLOR) {
+            Intent intent = new Intent(this, ColorListActivity.class);
+
+            startActivityForResult(intent, REQUEST_COLOR);
+            // scrollview.fullScroll(View.FOCUS_UP);
+            // mBody.moveCursorToVisibleOffset();
+        } else if (item.getItemId() == MENU_CHARSET) {
+            showDialog(ENCODE_DIALOG);
+        } else if (item.getItemId() == MENU_ROTATAION) {
+            if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);// .SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            }
+        } else if (item.getItemId() == MENU_FORMAT) {
+            showDialog(FORMAT_DIALOG);
+        } else if (item.getItemId() == MENU_BRIGHTNESS) {
+            showDialog(BRIGHTNESS_DIALOG);
+        }
+
+
+
+        return true;
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION);
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
+            rotationIgtem.setTitle(R.string.menu_lock);
+        } else {
+            rotationIgtem.setTitle(R.string.menu_unlock);
+        }
+
+        MenuItem formatItem = menu.getItem(MENU_FORMAT);
+        formatItem.setEnabled(mBook.supportFormat());
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void setPageTitle() {
+        TextView pageview = (TextView) findViewById(R.id.page_index);
+        TextView pageview1 = (TextView) findViewById(R.id.page_index1);
+
+        pageview.setText((mBook.mPage + 1) + " of " + mBook.getPageCount());
+        pageview1.setText(pageview.getText());
+    }
+
+    public final void showProgressBarVisibility(boolean visible) {
+        findViewById(R.id.progress_read).setVisibility(visible ? View.VISIBLE:View.GONE);
     }
 }

@@ -43,6 +43,63 @@ import com.android.ray.veader.util.Constatnts;
  */
 public class ColorListActivity extends ListActivity {
 
+    private final class FBColor {
+        public int foreground;
+        public int background;
+
+        FBColor(int f, int b) {
+            foreground = f;
+            background = b;
+        }
+
+    }
+
+
+
+    private class MyArrayAdapter extends ArrayAdapter<String> {
+        private FBColor[] mColorList;
+        private final String mString;
+
+        public MyArrayAdapter(Context context, int textViewResourceId) {
+            super(context, textViewResourceId);
+            mString = getResources().getString(R.string.choose_color);
+            ColorUtil colorUtil = new ColorUtil(context);
+            int size = colorUtil.getColorSize();
+            mColorList = new  FBColor[size];
+            
+            for(int i=0;i<size;i++){
+                int[] color  = colorUtil.getColor(i);
+                mColorList[i] = new FBColor(color[0], color[1]);
+            }
+        }
+
+        //@override
+        public int getCount() {
+            return mColorList.length;
+        }
+
+        //@override
+        public String getItem(int position) {
+            return mString;
+        }
+
+        //@override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = super.getView(position, convertView, parent);
+            }
+            if (convertView instanceof TextView) {
+                TextView tv = (TextView) convertView;
+                tv.setTextColor(mColorList[position].foreground);
+                tv.setBackgroundColor(mColorList[position].background);
+            }
+
+            return convertView;
+        }
+
+    };
+
+
     //@override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,63 +134,6 @@ public class ColorListActivity extends ListActivity {
                 finish();
             }
         });
-
-    }
-
-
-
-    private class MyArrayAdapter extends ArrayAdapter<String> {
-        private FBColor[] mColorList;
-        private final String mString;
-
-        public MyArrayAdapter(Context context, int textViewResourceId) {
-            super(context, textViewResourceId);
-            mString = getResources().getString(R.string.choose_color);
-            ColorUtil colorUtil = new ColorUtil(context);
-            int size = colorUtil.getColorSize();
-            mColorList = new  FBColor[size];
-            
-            for(int i=0;i<size;i++){
-                int[] color  = colorUtil.getColor(i);
-                mColorList[i] = new FBColor(color[0], color[1]);
-            }
-        }
-
-        //@override
-        public int getCount() {
-            return mColorList.length;
-        }
-
-        //@override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = super.getView(position, convertView, parent);
-            }
-            if (convertView instanceof TextView) {
-                TextView tv = (TextView) convertView;
-                tv.setTextColor(mColorList[position].foreground);
-                tv.setBackgroundColor(mColorList[position].background);
-            }
-
-            return convertView;
-        }
-
-        //@override
-        public String getItem(int position) {
-            return mString;
-        }
-
-    };
-
-
-    private final class FBColor {
-        public int foreground;
-        public int background;
-
-        FBColor(int f, int b) {
-            foreground = f;
-            background = b;
-        }
 
     }
 
