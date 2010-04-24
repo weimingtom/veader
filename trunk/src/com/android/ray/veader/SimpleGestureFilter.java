@@ -9,23 +9,31 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 
     
 
+	 static interface SimpleGestureListener{
+
+	 void onDoubleTap();
+
+	 void onSwipe(int direction);
+
+ }
+
 	 public final static int SWIPE_UP    = 1;
 
 	 public final static int SWIPE_DOWN  = 2;
 
 	 public final static int SWIPE_LEFT  = 3;
 
-	 public final static int SWIPE_RIGHT = 4;
-
 	 
+
+	 public final static int SWIPE_RIGHT = 4;
 
 	 public final static int MODE_TRANSPARENT = 0;
 
 	 public final static int MODE_SOLID       = 1;
 
-	 public final static int MODE_DYNAMIC     = 2;
-
 	 
+
+	 public final static int MODE_DYNAMIC     = 2;
 
 	 private final static int ACTION_FAKE = -13; //just an unlikely number
 
@@ -33,25 +41,27 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 
 	 private int swipe_Max_Distance = 350;
 
-	 private int swipe_Min_Velocity = 100;
-
 	 
+
+	 private int swipe_Min_Velocity = 100;
 
 	 private int mode      = MODE_DYNAMIC;
 
 	 private boolean running = true;
 
-	 private boolean tapIndicator = false;
-
 	 
+
+	 private boolean tapIndicator = false;
 
 	 private Activity context;
 
 	 private GestureDetector detector;
 
-	 private SimpleGestureListener listener;
+	 
 
 	 
+
+	 private SimpleGestureListener listener;
 
 	 
 
@@ -69,97 +79,9 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 
 	 
 
-	 public void onTouchEvent(MotionEvent event){
-
-	  
-
-	   if(!this.running)
-
-	  return;  
-
-	  
-
-	   boolean result = this.detector.onTouchEvent(event); 
-
-	  
-
-	   if(this.mode == MODE_SOLID)
-
-	    event.setAction(MotionEvent.ACTION_CANCEL);
-
-	   else if (this.mode == MODE_DYNAMIC) {
-
-	  
-
-	     if(event.getAction() == ACTION_FAKE) 
-
-	       event.setAction(MotionEvent.ACTION_UP);
-
-	     else if (result)
-
-	       event.setAction(MotionEvent.ACTION_CANCEL); 
-
-	     else if(this.tapIndicator){
-
-	      event.setAction(MotionEvent.ACTION_DOWN);
-
-	      this.tapIndicator = false;
-
-	     }
-
-	  
-
-	   }
-
-	   //else just do nothing, it's Transparent
-
-	 }
-
-	 
-
-	 public void setMode(int m){
-
-	  this.mode = m;
-
-	 }
-
-	 
-
 	 public int getMode(){
 
 	  return this.mode;
-
-	 }
-
-	 
-
-	 public void setEnabled(boolean status){
-
-	  this.running = status;
-
-	 }
-
-	 
-
-	 public void setSwipeMaxDistance(int distance){
-
-	  this.swipe_Max_Distance = distance;
-
-	 }
-
-	 
-
-	 public void setSwipeMinDistance(int distance){
-
-	  this.swipe_Min_Distance = distance;
-
-	 }
-
-	 
-
-	 public void setSwipeMinVelocity(int distance){
-
-	  this.swipe_Min_Velocity = distance;
 
 	 }
 
@@ -188,6 +110,26 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 	 }
 
 	 
+
+	 @Override
+
+	 public boolean onDoubleTap(MotionEvent arg0) {
+
+	  this.listener.onDoubleTap();;
+
+	  return true;
+
+	 }
+
+	 
+
+	 @Override
+
+	 public boolean onDoubleTapEvent(MotionEvent arg0) {
+
+	  return true;
+
+	 }
 
 	 
 
@@ -257,41 +199,7 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 
 	 }
 
-
-
-	 @Override
-
-	 public boolean onSingleTapUp(MotionEvent e) {
-
-	  this.tapIndicator = true;
-
-	  return false;
-
-	 }
-
-
-
-	 @Override
-
-	 public boolean onDoubleTap(MotionEvent arg0) {
-
-	  this.listener.onDoubleTap();;
-
-	  return true;
-
-	 }
-
-
-
-	 @Override
-
-	 public boolean onDoubleTapEvent(MotionEvent arg0) {
-
-	  return true;
-
-	 }
-
-
+	 
 
 	 @Override
 
@@ -315,15 +223,107 @@ public class SimpleGestureFilter extends SimpleOnGestureListener{
 
 	 
 
-	 
+	 @Override
 
-	    static interface SimpleGestureListener{
+	 public boolean onSingleTapUp(MotionEvent e) {
 
-	     void onSwipe(int direction);
+	  this.tapIndicator = true;
 
-	     void onDoubleTap();
+	  return false;
 
 	 }
+
+	 
+
+	 
+
+	 public void onTouchEvent(MotionEvent event){
+
+	  
+
+	   if(!this.running)
+
+	  return;  
+
+	  
+
+	   boolean result = this.detector.onTouchEvent(event); 
+
+	  
+
+	   if(this.mode == MODE_SOLID)
+
+	    event.setAction(MotionEvent.ACTION_CANCEL);
+
+	   else if (this.mode == MODE_DYNAMIC) {
+
+	  
+
+	     if(event.getAction() == ACTION_FAKE) 
+
+	       event.setAction(MotionEvent.ACTION_UP);
+
+	     else if (result)
+
+	       event.setAction(MotionEvent.ACTION_CANCEL); 
+
+	     else if(this.tapIndicator){
+
+	      event.setAction(MotionEvent.ACTION_DOWN);
+
+	      this.tapIndicator = false;
+
+	     }
+
+	  
+
+	   }
+
+	   //else just do nothing, it's Transparent
+
+	 }
+
+
+
+	 public void setEnabled(boolean status){
+
+	  this.running = status;
+
+	 }
+
+
+
+	 public void setMode(int m){
+
+	  this.mode = m;
+
+	 }
+
+
+
+	 public void setSwipeMaxDistance(int distance){
+
+	  this.swipe_Max_Distance = distance;
+
+	 }
+
+
+
+	 public void setSwipeMinDistance(int distance){
+
+	  this.swipe_Min_Distance = distance;
+
+	 }
+
+	 
+
+	 
+
+	    public void setSwipeMinVelocity(int distance){
+
+		  this.swipe_Min_Velocity = distance;
+
+		 }
 
 	 
 

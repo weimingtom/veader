@@ -25,4 +25,5 @@ public final class BookColumn implements BaseColumns {
     public static final String AUTHORID = "authorid";
     public static final String CATALOGID = "catalogid";
     public static final String WORDCOUNT = "wordcount";
+    public static final String DEFAULT_SORT_ORDER = "_id";
 }

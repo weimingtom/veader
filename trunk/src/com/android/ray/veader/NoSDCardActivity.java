@@ -45,6 +45,12 @@ public class NoSDCardActivity extends Activity {
         registerReceiver(mRecevier, new IntentFilter(intentFilter));
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mRecevier);
+        
+    }
+    
     public boolean onKeyDown(int keyCode, KeyEvent event) {
     	if (keyCode == KeyEvent.KEYCODE_BACK) {
     		Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -56,12 +62,6 @@ public class NoSDCardActivity extends Activity {
     	}
 
         return false;
-    }
-    
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mRecevier);
-        
     }
     
 }

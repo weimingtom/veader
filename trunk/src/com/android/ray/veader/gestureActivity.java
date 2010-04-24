@@ -39,12 +39,6 @@ public class gestureActivity extends Activity implements OnGestureListener
     }
    
     @Override
-    public boolean onTouchEvent(MotionEvent me)
-    {
-     return gestureScanner.onTouchEvent(me);
-    }
-   
-    @Override
     public boolean onDown(MotionEvent e)
     {
      viewA.setText("-" + "DOWN" + "-");
@@ -75,12 +69,18 @@ public class gestureActivity extends Activity implements OnGestureListener
     public void onShowPress(MotionEvent e)
     {
      viewA.setText("-" + "SHOW PRESS" + "-");
-    }    
+    }
    
     @Override
     public boolean onSingleTapUp(MotionEvent e)    
     {
      viewA.setText("-" + "SINGLE TAP UP" + "-");
      return true;
+    }    
+   
+    @Override
+    public boolean onTouchEvent(MotionEvent me)
+    {
+     return gestureScanner.onTouchEvent(me);
     }
 } 
