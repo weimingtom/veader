@@ -89,33 +89,46 @@ Log.d("mCount", String.valueOf(mCount));
             isProgressing = false;
         }
     }
-    public String[] getChaptersList() throws IOException{
-    	  FileChannel channel = new FileInputStream(mFile).getChannel();
-Log.d("geting chapter list", "xx");
-          channel.position(mRecodeOffset[0]);
-          StringBuilder body = new StringBuilder();
-          ByteBuffer bodyBuffer;
-    	 int length = mRecodeOffset[1] - mRecodeOffset[0];
-         int startpos = mRecodeOffset[0];
-         int _offset=22;
-       
-         	startpos = startpos + _offset;
-         	length = length -_offset;
-            Log.d("startpos!x!!", String.valueOf(startpos));
-            Log.d("length!!x!", String.valueOf(length));
-         bodyBuffer = channel.map(MapMode.READ_ONLY, startpos,
-                 length).order(ByteOrder.BIG_ENDIAN);
-         byte[] tmpCache = new byte[bodyBuffer.capacity()];
-         bodyBuffer.get(tmpCache);
-         String str = new String(tmpCache,mEncode);
-         
-         int intEob = 27;
-         String aChar = new Character((char)intEob).toString();
-         Log.d("chapter list!!!", str);
-str = str.replace(aChar, "\n");
-return str.split("\n");
-         
-    }
+
+	public String[] getChaptersList() throws IOException {
+		FileChannel channel = new FileInputStream(mFile).getChannel();
+		Log.d("geting chapter list", "xx");
+		channel.position(mRecodeOffset[0]);
+		StringBuilder body = new StringBuilder();
+		ByteBuffer bodyBuffer;
+		int length = mRecodeOffset[1] - mRecodeOffset[0];
+		int startpos = mRecodeOffset[0];
+		// int _offset=22;
+
+		startpos = startpos;
+		length = length;
+		Log.d("startpos!x!!", String.valueOf(startpos));
+		Log.d("length!!x!", String.valueOf(length));
+		bodyBuffer = channel.map(MapMode.READ_ONLY, startpos, length).order(
+				ByteOrder.BIG_ENDIAN);
+		byte[] tmpCache = new byte[bodyBuffer.capacity()];
+		bodyBuffer.get(tmpCache);
+		String str = new String(tmpCache, mEncode);
+
+	
+		str = cleantoc(str);
+		String[] _strlist = str.split("\n");
+		return _strlist;
+
+	}
+	private String cleantoc(String str){
+		int intEob = 27;
+		String aChar = new Character((char) intEob).toString();
+		Log.d("chapter list!!!", str);
+		str = str.replace(aChar, "\n");
+		while (str.contains("\n\n")) {
+			str = str.replace("\n\n", "\n");
+		}
+		str = str.replace(
+				this.mName + "\n" + String.valueOf(this.mCount - 1) + "\n", "")
+				.trim();
+		return str;
+	}
     public String getMyText() throws IOException {
         /* Record Header */
         int recordBegin = 78 + 8 * mCount;
@@ -157,9 +170,7 @@ return str.split("\n");
             }else{
                 String str = new String(tmpCache,mEncode);
                 if(mPage==0){
-                int intEob = 27;
-                String aChar = new Character((char)intEob).toString();
-str = str.replace(aChar, "\n");
+                str = this.cleantoc(str);
                 }
                 body.append(str);
                 
