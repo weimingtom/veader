@@ -146,7 +146,8 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // set the format to sql date time
 	Date date = new Date(createdate);
 String strDt= dateFormat.format(date).toString();
-	String strpercent = String.valueOf(percent) + "%";
+
+	String strpercent = String.valueOf(Math.round((percent*100))) + "%";
 	String strRemark = strpercent+"-Create date:"+strDt;
 			viewIcon.setImageResource(R.drawable.btn_bookmark);
 			if (tt != null) {
