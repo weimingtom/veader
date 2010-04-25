@@ -363,7 +363,7 @@ private static final int diag_confirmdelete = 1;
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
-	/*@Override
+	@Override
 	public void onBackPressed() {
 		boolean isBookList = this.getListAdapter().equals(_bookcursorAdapter);
 		boolean isLibList = this.getListAdapter().equals(_libcursorAdapter);
@@ -385,7 +385,7 @@ private static final int diag_confirmdelete = 1;
 			this.finish();
 		}
 
-	}*/
+	}
 
 public void showLib(){
 	libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
@@ -486,7 +486,7 @@ Log.d("got action?", String.valueOf(getIntent().getExtras()));
 		if (getIntent().getExtras() != null && 
                 getIntent().getExtras().containsKey("ACTION") ) 
             {
-			Log.d("got action?2", String.valueOf(getIntent().getExtras()));
+			
 		String strAction= getIntent().getExtras().getString("ACTION");
 		if(strAction.equals("BOOKMARK")){
 			listAllBookMark();
@@ -645,7 +645,27 @@ public void listAllBookMark(){
 			
 		}
 	}
+	private static final int MENU_EXIT = 1;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
+		// R.string.menu_text_size));
 
+		// menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
+		// menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
+		menu.add(0, MENU_EXIT, MENU_EXIT, R.string.menu_exit);
+
+		// menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
+		return true;
+
+	}
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		if (item.getItemId() == MENU_EXIT) {
+			this.finish();
+		}
+		return true;
+	}
 	@Override
 	public void onSwipe(int direction) {
 		// TODO Auto-generated method stub
