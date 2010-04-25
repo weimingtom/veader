@@ -13,6 +13,7 @@
 	<string name="menu_sort">Sort</string>
 	<string name="menu_about">About</string>
 	<string name="menu_color">Color</string>
+	<string name="menu_exit">Exit</string>
 	<string name="menu_catalog">Catalog</string>
 	<string name="menu_lib">Library</string>
 	<string name="menu_drop_all">Drop All</string>
@@ -21,6 +22,7 @@
 	<string name="menu_nextchapter">Next Chapter</string>
 	<string name="menu_previouschapter">Previous Chapter</string>
 	<string name="menu_gotopage">Go to page...</string>
+	<string name="menu_gotochapter">Go to chapter...</string>
 		<string name="menu_addbookmark">Add bookmark</string>
 				<string name="menu_bookmark">Bookmark</string>
 <string name="menu_delete">Delete</string>
