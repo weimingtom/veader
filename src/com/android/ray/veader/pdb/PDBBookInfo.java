@@ -31,7 +31,7 @@ public class PDBBookInfo extends AbstractBookInfo {
     public int mCount;
     public int[] mRecodeOffset;
     public boolean isProgressing;
-
+//public String[] mChapterTitles;
     public PDBBookInfo(long id){
         super(id);
     }
@@ -39,7 +39,7 @@ public class PDBBookInfo extends AbstractBookInfo {
     //@Override
     public void setFile(File pdb) throws IOException {
         mFile = pdb;
-
+Log.d("in set file", "");
         mPage = 0;
         FileChannel channel = new FileInputStream(pdb).getChannel();
 
@@ -48,6 +48,7 @@ public class PDBBookInfo extends AbstractBookInfo {
         mName = new String(nameByte, mEncode).replace('_',' ').trim();
 
         mCount = channel.map(MapMode.READ_ONLY, 76, 2).asCharBuffer().get();
+        mCount = mCount -1;
 Log.d("mCount", String.valueOf(mCount));
         int offset = 78;
         mRecodeOffset = new int[mCount];
@@ -56,10 +57,9 @@ Log.d("mCount", String.valueOf(mCount));
                     .asIntBuffer().get();
             offset += 8;
         }
-        
+        this.mChapterTitles = getChaptersList();
         channel.close();
         
-
     }
    
     //@Override
@@ -89,7 +89,33 @@ Log.d("mCount", String.valueOf(mCount));
             isProgressing = false;
         }
     }
-    
+    public String[] getChaptersList() throws IOException{
+    	  FileChannel channel = new FileInputStream(mFile).getChannel();
+Log.d("geting chapter list", "xx");
+          channel.position(mRecodeOffset[0]);
+          StringBuilder body = new StringBuilder();
+          ByteBuffer bodyBuffer;
+    	 int length = mRecodeOffset[1] - mRecodeOffset[0];
+         int startpos = mRecodeOffset[0];
+         int _offset=22;
+       
+         	startpos = startpos + _offset;
+         	length = length -_offset;
+            Log.d("startpos!x!!", String.valueOf(startpos));
+            Log.d("length!!x!", String.valueOf(length));
+         bodyBuffer = channel.map(MapMode.READ_ONLY, startpos,
+                 length).order(ByteOrder.BIG_ENDIAN);
+         byte[] tmpCache = new byte[bodyBuffer.capacity()];
+         bodyBuffer.get(tmpCache);
+         String str = new String(tmpCache,mEncode);
+         
+         int intEob = 27;
+         String aChar = new Character((char)intEob).toString();
+         Log.d("chapter list!!!", str);
+str = str.replace(aChar, "\n");
+return str.split("\n");
+         
+    }
     public String getMyText() throws IOException {
         /* Record Header */
         int recordBegin = 78 + 8 * mCount;
@@ -100,8 +126,17 @@ Log.d("mCount", String.valueOf(mCount));
         StringBuilder body = new StringBuilder();
         ByteBuffer bodyBuffer;
         if (mPage + 1 < mCount) {
+        	Log.d("MPAGE?", String.valueOf(mPage));
             int length = mRecodeOffset[mPage + 1] - mRecodeOffset[mPage];
-            bodyBuffer = channel.map(MapMode.READ_ONLY, mRecodeOffset[mPage],
+            int startpos = mRecodeOffset[mPage];
+            int _offset=22;
+            if (mPage==0){
+            	startpos = startpos + _offset;
+            	length = length -_offset;
+            }
+            Log.d("startpos!!!", String.valueOf(startpos));
+            Log.d("length!!!", String.valueOf(length));
+            bodyBuffer = channel.map(MapMode.READ_ONLY, startpos,
                     length).order(ByteOrder.BIG_ENDIAN);
             byte[] tmpCache = new byte[bodyBuffer.capacity()];
             bodyBuffer.get(tmpCache);
@@ -121,7 +156,14 @@ Log.d("mCount", String.valueOf(mCount));
                 input.close();
             }else{
                 String str = new String(tmpCache,mEncode);
+                if(mPage==0){
+                int intEob = 27;
+                String aChar = new Character((char)intEob).toString();
+str = str.replace(aChar, "\n");
+                }
                 body.append(str);
+                
+                str.charAt(1);
             }
         } else {
             bodyBuffer = ByteBuffer.wrap(new byte[8192]);
@@ -129,7 +171,7 @@ Log.d("mCount", String.valueOf(mCount));
             while ((idx = channel.read(bodyBuffer)) > 0) {
                 String str = new String(bodyBuffer.array(), mEncode);
                 body.append(str);
-                if(isStop){
+            if(isStop){
                     isStop = false;
                     break;
                 }
@@ -147,7 +189,6 @@ Log.d("mCount", String.valueOf(mCount));
     public String getPalmDoc() throws IOException, DataFormatException {
         PalmDocDB palmDoc = new PalmDocDB(mFile,mEncode);
         mCount = palmDoc.getNumDataRecords();
-        Log.d("getpalmdoc, page:",String.valueOf(mPage) );
         String result = palmDoc.readTextRecord(mPage);
         palmDoc.close();
         return result;

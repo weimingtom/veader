@@ -11,7 +11,7 @@ public abstract class AbstractBookInfo {
     public File mFile;
     public String mEncode;
     public int mFormat;
-
+    public String[] mChapterTitles;
     private String path;
    private String description;
    private int catalogid;
@@ -47,6 +47,10 @@ public abstract class AbstractBookInfo {
     public void setcatalogid(int catalogid) {
         this.catalogid = catalogid;
     }
+    public String[] getChapters() {
+        return this.mChapterTitles;
+    }
+   
     public void setEncode( String encode){
         mEncode = encode;
     }

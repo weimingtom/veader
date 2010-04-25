@@ -66,7 +66,62 @@ import android.widget.ZoomControls;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class VeaderActivity extends Activity implements SimpleGestureListener {
+	private static final String LOG_TAG = "WebViewDemo";
+	private String percent;
+	private WebView mWebView;
+	private TextView txtbottomleft, txtbottomright, txtbottomcenter;
+	private Handler mHandler = new Handler();
+	long currentChapter, pageno;
+	long bookid;
+	float fltPercent;
+	// private GestureDetector gestureScanner;
+	protected static final String TAG = "PilotBookReaderActivity";
+	private static final int MAX_TEXT_SIZE = 36;
+	private static final int MIN_TEXT_SIZE = 8;
+	private static final int REQUEST_COLOR = 0x123;
+	private int mPage;
+	private long previousPage;
+	private ZoomControls zoomControl;
+	private AbstractBookInfo mBook;
+private String bookpath;
+	private SimpleGestureFilter filter;
 
+	private GestureDetector gestureDetector;
+
+	View.OnTouchListener gestureListener;
+	private int paramPage;
+	private Handler pHandler;
+
+	private int totalPage;
+
+	protected int lastOffset;
+
+	protected boolean isLastChapterLastPage;
+
+	/* ---------------------menu---------------------------- */
+	private static final int MENU_ZOOM = 0;
+
+	private static final int MENU_COLOR = 1;
+	private static final int MENU_CHARSET = 2;
+	private static final int MENU_ROTATAION = 3;
+
+	private static final int MENU_FORMAT = 4;
+
+	private static final int MENU_LIB = 5;
+
+	private static final int MENU_BOOKMARK = 6;
+	private static final int MENU_ADDBOOKMARK = 7;
+
+	private static final int ENCODE_DIALOG = 3;
+
+	private static final int FORMAT_DIALOG = 1;
+
+	private static final int BRIGHTNESS_DIALOG = 2;
+
+	private static final int diag_Menu = 0;
+
+	private static final int diag_goto = 4;
+	private static final int diag_chapter = 5;
 	final class DemoJavaScriptInterface {
 
 		DemoJavaScriptInterface() {
@@ -434,60 +489,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 
 	}
 
-	private static final String LOG_TAG = "WebViewDemo";
-	private String percent;
-	private WebView mWebView;
-	private TextView txtbottomleft, txtbottomright, txtbottomcenter;
-	private Handler mHandler = new Handler();
-	long currentChapter, pageno;
-	long bookid;
-	float fltPercent;
-	// private GestureDetector gestureScanner;
-	protected static final String TAG = "PilotBookReaderActivity";
-	private static final int MAX_TEXT_SIZE = 36;
-	private static final int MIN_TEXT_SIZE = 8;
-	private static final int REQUEST_COLOR = 0x123;
-	private int mPage;
-	private long previousPage;
-	private ZoomControls zoomControl;
-	private AbstractBookInfo mBook;
-
-	private SimpleGestureFilter filter;
-
-	private GestureDetector gestureDetector;
-
-	View.OnTouchListener gestureListener;
-	private int paramPage;
-	private Handler pHandler;
-
-	private int totalPage;
-
-	protected int lastOffset;
-
-	protected boolean isLastChapterLastPage;
-
-	/* ---------------------menu---------------------------- */
-	private static final int MENU_ZOOM = 0;
-
-	private static final int MENU_COLOR = 1;
-	private static final int MENU_CHARSET = 2;
-	private static final int MENU_ROTATAION = 3;
-
-	private static final int MENU_FORMAT = 4;
-
-	private static final int MENU_LIB = 5;
-
-	private static final int MENU_BOOKMARK = 6;
-
-	private static final int ENCODE_DIALOG = 3;
-
-	private static final int FORMAT_DIALOG = 1;
-
-	private static final int BRIGHTNESS_DIALOG = 2;
-
-	private static final int diag_Menu = 0;
-
-	private static final int diag_goto = 4;
+	
 
 	public void debug(String msg) {
 
@@ -732,6 +734,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			int nameIdx = cursor.getColumnIndexOrThrow(BookColumn.NAME);
 
 			path = cursor.getString(pathIdx);
+			bookpath =path;
 			encode = cursor.getString(encodeIdx);
 			lastPage = cursor.getInt(lastpageIdx);
 			format = cursor.getInt(formatIdx);
@@ -783,7 +786,9 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 					getString(R.string.menu_previous5),
 					getString(R.string.menu_nextchapter),
 					getString(R.string.menu_previouschapter),
-					getString(R.string.menu_addbookmark) };
+					getString(R.string.menu_gotochapter,
+					getString(R.string.menu_addbookmark))
+					};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle("");
@@ -798,17 +803,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 					switch (item) {
 					case 0:
 						Context mContext = getApplicationContext();
-						/*
-						 * Context mContext = getApplicationContext(); Dialog
-						 * _dialog = new Dialog(mContext);
-						 * 
-						 * _dialog.setContentView(R.layout.gotopage);
-						 * _dialog.setTitle("Go to Page");
-						 * 
-						 * TextView text = (TextView)
-						 * _dialog.findViewById(R.id.txtpageno);
-						 * text.setText("Hello, this is a custom dialog!");
-						 */
+						
 						dismissDialog(diag_Menu);
 						showDialog(diag_goto);
 						break;
@@ -829,6 +824,19 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 						previousChapter(0);
 						break;
 					case 5:
+						dismissDialog(diag_Menu);
+						//showDialog(diag_chapter);
+						Intent intent = new Intent(VeaderActivity.this, chapterDialog.class);
+						
+						intent.putExtra("ID", VeaderActivity.this.bookid);
+						intent.putExtra("PATH", VeaderActivity.this.bookpath);
+						intent.putExtra("ENCODE", VeaderActivity.this.mBook.mEncode);
+						Log.d("bookid", String.valueOf(VeaderActivity.this.bookid));
+						Log.d("path", String.valueOf(VeaderActivity.this.bookpath));
+						
+						startActivityForResult(intent, REQUEST_COLOR);
+						break;
+					case 6:
 						insertBookmark(0);
 						break;
 					}
@@ -840,6 +848,9 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			});
 
 			return builder.create();
+			
+			
+			
 		case ENCODE_DIALOG:
 			String[] charsetArray = getResources().getStringArray(
 					R.array.charset);
@@ -898,11 +909,41 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 		case diag_goto:
 
 			return new menuVeaderActivity(this);
+			
+		case diag_chapter:
+
+				Intent intent = new Intent(this, chapterDialog.class);
+
+			startActivityForResult(intent, REQUEST_COLOR);
 
 		}
 		return null;
 	}
 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (resultCode) {
+		case RESULT_OK:
+			Bundle b = data.getExtras();
+	
+				long lngChapterID = b.getLong("CHAPTERID");
+				Log.d("getresult?", String.valueOf(lngChapterID));
+
+				mBook.mPage = (int) lngChapterID + 1;
+				Log.d("jump to page", "has page");
+				try {
+					final CharSequence txt = mBook.getText();
+
+					String temp = txt.toString().replace("\n", ":br:");
+
+					new loadContentTask().execute(txt, "0");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			break;
+		}
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
@@ -911,6 +952,7 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 		// menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
 		// menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
 		menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
+		menu.add(0, MENU_ADDBOOKMARK, MENU_ADDBOOKMARK, R.string.menu_addbookmark);
 		// menu.add(0, MENU_FORMAT, MENU_FORMAT, R.string.menu_format);
 		menu.add(0, MENU_LIB, MENU_LIB, R.string.menu_lib);
 		// menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
@@ -960,7 +1002,14 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 			}
 		} else if (item.getItemId() == MENU_FORMAT) {
 			showDialog(FORMAT_DIALOG);
-		} else if (item.getItemId() == MENU_LIB) {
+		} else if (item.getItemId() == MENU_ADDBOOKMARK) {
+
+			insertBookmark(0);
+		
+		// dismissDialog (diag_Menu);
+		Toast.makeText(getApplicationContext(), "Bookmark added",
+				Toast.LENGTH_SHORT).show();
+		}else if (item.getItemId() == MENU_LIB) {
 			Intent intent = new Intent();
 
 			intent.setClassName(VeaderActivity.this, LibraryList.class
