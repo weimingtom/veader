@@ -448,7 +448,8 @@ public void showLib(){
 
 		libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
 				null, CatalogColumn.DEFAULT_SORT_ORDER);
-		this.setListAdapter(new LibCursorAdapter(this, libCursor));
+		_libcursorAdapter = new LibCursorAdapter(this, libCursor);
+		this.setListAdapter(_libcursorAdapter);
 
 		getListView().setOnCreateContextMenuListener(this);
 		final Button btnAdd = (Button) findViewById(R.id.btnAddLib);
@@ -663,6 +664,7 @@ public void listAllBookMark(){
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		if (item.getItemId() == MENU_EXIT) {
+			
 			this.finish();
 		}
 		return true;
