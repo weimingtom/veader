@@ -79,7 +79,8 @@ public class VeaderActivity extends Activity implements SimpleGestureListener {
 	private static final int MAX_TEXT_SIZE = 36;
 	private static final int MIN_TEXT_SIZE = 8;
 	private static final int REQUEST_COLOR = 0x123;
-	private int mPage;
+	private static final int REQUEST_BOOKMARK = 0x124;
+	//private int mPage;
 	private long previousPage;
 	private ZoomControls zoomControl;
 	private AbstractBookInfo mBook;
@@ -122,15 +123,15 @@ private String bookpath;
 
 	private static final int diag_goto = 4;
 	private static final int diag_chapter = 5;
-	final class DemoJavaScriptInterface {
+/*	final class DemoJavaScriptInterface {
 
 		DemoJavaScriptInterface() {
 		}
 
-		/**
+		*//**
 		 * This is not called on the UI thread. Post a runnable to invoke
 		 * loadUrl on the UI thread.
-		 */
+		 *//*
 		public void clickOnAndroid() {
 			mHandler.post(new Runnable() {
 				public void run() {
@@ -140,7 +141,7 @@ private String bookpath;
 			});
 
 		}
-	}
+	}*/
 
 	private class loadContentTask extends AsyncTask<CharSequence, Void, String> {
 		private final ProgressDialog dialog = new ProgressDialog(
@@ -169,9 +170,9 @@ private String bookpath;
 			if (this.dialog.isShowing()) {
 				this.dialog.dismiss();
 			}
-			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
-					+ mBook.getPageCount());
-
+		String ChapterName;
+		ChapterName=(mBook.mPage >0)? mBook.mChapterTitles [mBook.mPage -1]:"";
+			VeaderActivity.this.txtbottomright.setText(ChapterName);
 		}
 
 		// can use UI thread here
@@ -263,9 +264,12 @@ private String bookpath;
 			if (this.dialog.isShowing()) {
 				this.dialog.dismiss();
 			}
-			VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
-					+ mBook.getPageCount());
-
+			//VeaderActivity.this.txtbottomright.setText((mBook.mPage + 1) + "/"
+			//		+ mBook.getPageCount());
+			String chapterName;
+			
+				chapterName=(mBook.mPage >0)? mBook.mChapterTitles [mBook.mPage -1]:"";
+			VeaderActivity.this.txtbottomright.setText(chapterName);
 		}
 
 		// can use UI thread here
@@ -597,6 +601,8 @@ private String bookpath;
 		values.put(BookmarkColumn.NAME, mBook.getname());
 		values.put(BookmarkColumn.DESCRIPTION, mBook.getname());
 		values.put(BookmarkColumn.BOOKID, this.bookid);
+		values.put(BookmarkColumn.CHAPTERTITLE, mBook.mChapterTitles[mBook.mPage -1]);
+		values.put(BookmarkColumn.TYPE , i);
 
 		Uri result = getContentResolver().insert(BookmarkColumn.CONTENT_URI,
 				values);
@@ -646,13 +652,13 @@ private String bookpath;
 		builder.append("bookname");
 		builder.setSpan(new ForegroundColorSpan(Color.rgb(148, 83, 61)), 4, 7,
 				Spanned.SPAN_COMPOSING);
-		txtbottomleft.setText("bookname");
+		//txtbottomleft.setText("bookname");
 		int intFontColor = Color.rgb(105, 60, 44);
 		txtbottomleft.setTextColor(intFontColor);
-		txtbottomcenter.setText("Chapter");
+		//txtbottomcenter.setText("Chapter");
 		txtbottomcenter.setTextColor(intFontColor);
 
-		txtbottomright.setText("1/100");
+	//	txtbottomright.setText("1/100");
 		txtbottomright.setTextColor(intFontColor);
 		WebSettings webSettings = mWebView.getSettings();
 		webSettings.setSavePassword(false);
@@ -663,7 +669,7 @@ private String bookpath;
 		mWebView.setWebChromeClient(new MyWebChromeClient());
 		mWebView.setScrollContainer(isRestricted());
 
-		mWebView.addJavascriptInterface(new DemoJavaScriptInterface(), "demo");
+		//mWebView.addJavascriptInterface(new DemoJavaScriptInterface(), "demo");
 
 		// tablebottom.setBackgroundColor(150);
 		mWebView.loadUrl("file:///android_asset/view.html");
@@ -716,7 +722,7 @@ private String bookpath;
 						BookColumn.LAST_PAGE, BookColumn.FORMAT,
 						BookColumn.LAST_OFFSET }, null, null, null);
 
-		Log.d("after q", "");
+
 		String path = "";
 		String encode = null;
 		String name = null;
@@ -802,7 +808,7 @@ private String bookpath;
 							.valueOf(VeaderActivity.this.totalPage));
 					switch (item) {
 					case 0:
-						Context mContext = getApplicationContext();
+					
 						
 						dismissDialog(diag_Menu);
 						showDialog(diag_goto);
@@ -984,12 +990,12 @@ private String bookpath;
 			intent.setClassName(VeaderActivity.this, LibraryList.class
 					.getName());
 			
-			//startActivity(intent);
+		
 			
 			
 			intent.putExtra("ACTION","BOOKMARK");
-	
-			startActivity(intent);
+	this.startActivityForResult(intent, REQUEST_BOOKMARK);
+			//startActivity(intent);
 			//Intent intent = new Intent(this, bookmarkDialog.class);
 
            // startActivityForResult(intent, REQUEST_COLOR);
@@ -1052,15 +1058,14 @@ private String bookpath;
 	}
 
 	public boolean previousChapter(int pos) {
-		Log.d("fn!prev page", "prev page");
+	
 		Log.d("has prev?", String.valueOf(mBook.hasPrevPage()));
-		// new loadContentTask().execute("¦V¥k");
-		// VeaderActivity.this.settext("¦V¥k");
+	
 		Log.d("currentPage", String.valueOf(mBook.mPage));
 		if (currentChapter == 0)
 			return false;
 		if (mBook.hasPrevPage()) {
-			// mBody.setText("");
+		
 			mBook.prevPage();
 			if (mBook.isProgressing()) {
 				mBook.stop();
@@ -1068,7 +1073,7 @@ private String bookpath;
 
 			try {
 				final CharSequence txt = mBook.getText();
-				// debug (txt);
+			
 				Log.d("hasnext!!", "");
 				String temp = txt.toString().replace("\n", ":br:");
 				if (pos == 100) {
@@ -1088,9 +1093,12 @@ private String bookpath;
 
 	private void setPageTitle() {
 
-		txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
-				+ mBook.getPageCount());
-
+	//	txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
+		//		+ mBook.getPageCount());
+		String chapterName;
+		
+		chapterName=(mBook.mPage >0)? mBook.mChapterTitles [mBook.mPage -1]:"";
+		txtbottomright.setText(chapterName);
 	}
 
 	final void settext(CharSequence strtxt) {

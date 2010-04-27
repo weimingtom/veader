@@ -80,14 +80,16 @@ public class VeaderProvider extends ContentProvider {
       		db.beginTransaction();
     		db.execSQL("CREATE TABLE IF NOT EXISTS catalog (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
     						+ "path varchar, name varchar, description varchar, catagoryid varchar);");
-
     		db.execSQL("CREATE TABLE IF NOT EXISTS books (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
     						+ "path varchar, description varchar, lastoffset int, lastpage int, encode varchar, author varchar" 
     						+ ",name varchar, size INT, rating int, replace int, format int,wordcount int, authorid int, catalogid INT,createdate long);");
     		db.execSQL("CREATE TABLE IF NOT EXISTS author (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
     						+ "name varchar, description varchar,  dob date, dod date);");
     		db.execSQL("CREATE TABLE IF NOT EXISTS bookmark (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-    						+ "name varchar,totalpage numeric, description varchar, bookid INT, page int,chapter int,type int, createdate date default CURRENT_DATE);");
+    						+ "name varchar,totalpage numeric, description varchar, bookid INT, page int,chapter int,type int,chaptertitle varchar, createdate date default CURRENT_DATE);");
+    		db.execSQL("CREATE TABLE IF NOT EXISTS veadersys (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+					+ "userlang varchar,readerlang numeric, fontsize INT, fontcolor INT, fixorientation int,version int, reserve1 int, reserve2 int, createdate date default CURRENT_DATE);");
+	
     		db.setTransactionSuccessful();
     		db.endTransaction();
           
@@ -99,6 +101,21 @@ public class VeaderProvider extends ContentProvider {
           // db.execSQL("DROP TABLE IF EXISTS " + "catalog");
            //db.execSQL("DROP TABLE IF EXISTS " + "books");
            //db.execSQL("DROP TABLE IF EXISTS " + "author");
+        	Log.d("old dbver?", String.valueOf(oldVersion));
+        	Log.d("new ver?", String.valueOf(newVersion));
+        	if (newVersion <=11){
+        	//	db.beginTransaction();
+        	//	db.execSQL("alter table bookmark add column 'chaptertitle'");
+        	//	db.endTransaction();
+        //	db.close();
+        	}
+        	   Cursor cursor = db.rawQuery("SELECT count(*) FROM sqlite_master WHERE  name = 'bookmark' and sql like '%chaptertitle%'", null);
+        		cursor.moveToNext();
+        		    if(cursor.getInt(0)==0){
+        		    	
+        		    	db.execSQL("alter table bookmark add column 'chaptertitle'");
+        		    	db.close();
+        		    }
             onCreate(db);
         }
     }
@@ -450,6 +467,7 @@ public class VeaderProvider extends ContentProvider {
         sBookmarkMap.put(BookmarkColumn.TOTALPAGE, BookmarkColumn.TOTALPAGE);
         sBookmarkMap.put(BookmarkColumn.CREATEDATE, BookmarkColumn.CREATEDATE);
         sBookmarkMap.put(BookmarkColumn.BOOKID, BookmarkColumn.BOOKID);
+        sBookmarkMap.put(BookmarkColumn.CHAPTERTITLE, BookmarkColumn.CHAPTERTITLE);
         sCatalogMap = new HashMap<String, String>();
         
         sCatalogMap.put(CatalogColumn._ID, CatalogColumn._ID);

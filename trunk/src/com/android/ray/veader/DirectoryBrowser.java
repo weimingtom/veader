@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 
 import android.os.Bundle;
 import android.view.View;
@@ -81,6 +82,7 @@ public class DirectoryBrowser extends ListActivity {
 			return v;
 		}
 	}
+
 	private List<String> items = null;
 	String dbpath, dbname, dblocation;
 	TextView textCurrentFolder;
@@ -90,7 +92,7 @@ public class DirectoryBrowser extends ListActivity {
 
 	private libraryAdapter m_adapter;
 	private Library selectedLib;
-
+	TextView txtbooksfound;
 	Thread thread;
 
 	private Runnable returnRes = new Runnable() {
@@ -143,8 +145,6 @@ public class DirectoryBrowser extends ListActivity {
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
-	
-
 	private void InsertLibrary(final String... args) {
 
 		String _msg;
@@ -160,15 +160,13 @@ public class DirectoryBrowser extends ListActivity {
 			// this.dialog.setMessage("Creating New");
 			File file = new File(path);
 			ArrayList<Books> booklist = null;
-			// Books book = null;
-			int catid = this.application.getDataHelper()
-			.getMaxLibID();
+
+			int catid = this.application.getDataHelper().getMaxLibID();
 			for (File _f : file.listFiles()) {
 				if (!_f.isDirectory()) {
 					String _filename = _f.getName().toString().trim();
-					if (Pattern.matches("(.*)([.]pdb)$", _filename)) {
+					if (Pattern.matches("(.*)([.]pdb?|PDB?)$", _filename)) {
 						// book = new Books();
-						
 
 						// int catid= (catid.)?0:catid;
 
@@ -204,7 +202,7 @@ public class DirectoryBrowser extends ListActivity {
 							Log.d("DirectoryBrowser", e.getMessage(), e);
 							// skip
 						}
-						
+
 					}
 				}
 			}
@@ -233,11 +231,12 @@ public class DirectoryBrowser extends ListActivity {
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
 
-	private void listDir(File _file) {
+	private int listDir(File _file) {
 		TextView textCurrentFolder = (TextView) findViewById(R.id.currentfolder);
 		textCurrentFolder.setText(_file.toString());
 		File[] files = _file.listFiles();
 		boolean hasEbook = false;
+		int pdbcount = 0;
 		try {
 			_library = new ArrayList<Library>();
 
@@ -251,7 +250,7 @@ public class DirectoryBrowser extends ListActivity {
 			if (_file.isDirectory()) {
 				String parentPath = (_file.getParent() == null) ? "" : _file
 						.getParent();
-			
+
 				_lib2.setname(getString(R.string.parentdir));
 				_lib2.setpath(parentPath);
 				_library.add(_lib2);
@@ -268,6 +267,10 @@ public class DirectoryBrowser extends ListActivity {
 					_lib.setpath(file.getPath());
 					_library.add(_lib);
 				}
+				if (Pattern.matches("(.*)([.]pdb?|PDB?)$", file.getName()
+						.trim())) {
+					pdbcount++;
+				}
 			}
 			this.m_adapter = new libraryAdapter(this, R.layout.row_directory,
 					_library);
@@ -278,16 +281,28 @@ public class DirectoryBrowser extends ListActivity {
 			Log.e("BACKGROUND_PROC", e.getMessage());
 		}
 		// runOnUiThread(returnRes);
+		txtbooksfound = (TextView) findViewById(R.id.txtbooksfound);
+		txtbooksfound.setText(String.valueOf(pdbcount) + " books found");
+		return pdbcount;
 	}
 
 	public void onBackPressed() {
 		try {
-			Intent intent = new Intent();
-			Bundle bundle = new Bundle();
-			intent.setClassName(DirectoryBrowser.this, LibraryList.class
-					.getName());
-			intent.putExtras(bundle);
-			startActivity(intent);
+			/*
+			 * Intent intent = new Intent(); Bundle bundle = new Bundle();
+			 * intent.setClassName(DirectoryBrowser.this, LibraryList.class
+			 * .getName()); intent.putExtras(bundle); startActivity(intent);
+			 */
+
+			// int selectedRow = (int) id;
+			// Log.d("selectedID", String.valueOf(id));
+			Bundle bdlChapter = new Bundle();
+			bdlChapter.putBoolean("ACTADDLIB", true);
+			Intent i = new Intent();
+
+			i.putExtras(bdlChapter);
+			this.setResult(RESULT_OK, i);
+			finish();
 		} catch (Exception e) {
 			this.debug(e.getMessage());
 
@@ -296,27 +311,24 @@ public class DirectoryBrowser extends ListActivity {
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-
+		
 		super.onCreate(savedInstanceState);
-
+txtbooksfound = (TextView) findViewById(R.id.txtbooksfound);
 		setContentView(R.layout.directoryexplorer);
 		dbname = getResources().getString(R.string.dbname).toString();
-		textCurrentFolder = (TextView) findViewById(R.id.currentfolder);
-
+	
 		// fnInitDB();
-
+		int bookcount = 0;
+		
 		this.application = (MyApplication) this.getApplication();
-		try {
+		//try {
 
 			listDir(new File("/sdcard/"));
 
-		} catch (Exception e) {
-
-			textCurrentFolder.setText(e.getMessage().toString());
-
-		}
+		
 		final Button btnSelect = (Button) findViewById(R.id.btnSelect);
-
+	
+		//txtbooksfound.setText(String.valueOf(bookcount) + "books found");
 		btnSelect.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
@@ -324,6 +336,9 @@ public class DirectoryBrowser extends ListActivity {
 						.getDescription(), selectedLib.getname());
 			}
 		});
+		textCurrentFolder = (TextView) findViewById(R.id.currentfolder);
+		int intFontColor = Color.rgb(105, 60, 44);
+		txtbooksfound.setTextColor(intFontColor);
 	}
 
 	@Override
@@ -335,17 +350,15 @@ public class DirectoryBrowser extends ListActivity {
 		} else {
 			this.selectedLib = _library.get(selectedRow);
 			final File file = new File(_library.get(selectedRow).getpath());
-			
+
 			if (file.isDirectory()) {
 
 				listDir(file);
 
 			} else {
-			
+
 			}
 		}
 	}
-
-	
 
 }
