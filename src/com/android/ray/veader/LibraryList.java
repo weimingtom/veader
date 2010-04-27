@@ -614,6 +614,7 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 				// intent.setClassName(LibraryList.this, VeaderActivity.class
 				// .getName());
 				// startActivity(intent);
+				intent.putExtra("TARGET", "READ");
 				intent.putExtra("PATH", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.PATH)));
 				intent.putExtra("ENCODE", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.ENDCODE)));
 				intent.setClassName(LibraryList.this, chapterDialog.class

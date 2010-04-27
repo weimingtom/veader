@@ -700,6 +700,7 @@ private String bookpath;
 		setProgressBarIndeterminate(true);
 		// long id =2;
 		long id = getIntent().getExtras().getLong("ID");
+		
 		int intParamChapter = getIntent().getExtras().getInt("CHAPTER");
 		this.fltPercent = getIntent().getExtras().getInt("PERCENT");
 		_paramPage = getIntent().getExtras().getInt("PAGE");

@@ -33,7 +33,7 @@ public class PDBBookInfo extends AbstractBookInfo {
     public int mCount;
     public int[] mRecodeOffset;
     public boolean isProgressing;
-//public String[] mChapterTitles;
+
     public PDBBookInfo(long id){
         super(id);
     }

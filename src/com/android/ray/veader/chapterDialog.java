@@ -99,20 +99,19 @@ ImageView viewIcon;
 
 	private ArrayList<clsChapter> _chapterlist = null;
 	private String path, encode;
-	private long id;
+	private long  bookid;
     //@override
     public void onCreate(Bundle savedInstanceState) {
     	_chapterlist = new ArrayList<clsChapter>();
         super.onCreate(savedInstanceState);
-         id= getIntent().getExtras().getLong("ID");
+         bookid= getIntent().getExtras().getLong("ID");
+       //  this.bookid = id;
       path = getIntent().getExtras().getString("PATH");
       encode = getIntent().getExtras().getString("ENCODE");
-      Log.d("id", String.valueOf(id));
-      Log.d("path", String.valueOf(path));
-      Log.d("path", String.valueOf(encode));
-        
+      Log.d("id", String.valueOf(bookid));
+     
 		File f = new File(path);
-		mBook = AbstractBookInfo.newBookInfo(f, id);
+		mBook = AbstractBookInfo.newBookInfo(f, bookid);
 		try {
 		mBook.setEncode(encode);
 			mBook.setFile(f);
@@ -139,9 +138,29 @@ ImageView viewIcon;
           
          
            
-         i.putExtras(bdlChapter);  
-        this.setResult(RESULT_OK,  i);
-         finish();
+         i.putExtras(bdlChapter); 
+      
+		if (getIntent().getExtras() != null
+				&& getIntent().getExtras().containsKey("TARGET")) {
+			String strTarget = getIntent().getExtras().getString("TARGET");
+			if (strTarget.equals("READ")) {
+				Intent intent = new Intent();
+				intent.putExtra("ID", this.bookid);
+				Log.d("chapter", String.valueOf(id));
+				intent.putExtra("CHAPTER", (int)id);
+				//intent.putExtra("PAGE", 1);
+			//	intent.putExtra("TOTALPAGE", totalPage);
+				//intent.putExtra("PERCENT", percent);
+
+				Log.d("BOOKID", String.valueOf(id));
+				intent.setClassName(chapterDialog.this, VeaderActivity.class
+						.getName());
+				startActivity(intent);
+			} 
+		}else {
+			this.setResult(RESULT_OK, i);
+			finish();
+		}
     }
 
 }
