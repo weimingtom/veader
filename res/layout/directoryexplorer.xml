@@ -10,8 +10,9 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 android:id="@+id/widget66"
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
-android:background="#ff333333"
+ android:background="@+drawable/toolbarreader"
 android:padding="5dip"
+android:orientation="horizontal"
 >
 <Button
 android:id="@+id/btnSelect"
@@ -20,6 +21,15 @@ android:layout_height="wrap_content"
 android:text="Select Current Folder"
 android:clickable="true">
 </Button>
+<TextView
+android:id="@+id/txtbooksfound"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text=""
+android:gravity="right"
+
+style="@android:style/TextAppearance.Medium" 
+></TextView>
 </LinearLayout>
 <LinearLayout
 android:id="@+id/widget66"
@@ -30,10 +40,11 @@ android:padding="5dip"
 >
 <TextView
 android:id="@+id/currentfolder"
-android:layout_width="wrap_content"
+
+android:layout_width="fill_parent"
 android:layout_height="wrap_content"
 android:text=""
-></TextView>
+android:textColor="#FFFBF1"></TextView>
 </LinearLayout>
 
 

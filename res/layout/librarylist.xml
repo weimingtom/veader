@@ -2,54 +2,78 @@
 <LinearLayout android:id="@+id/widget65"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	android:orientation="vertical" android:gravity="bottom"
-	 xmlns:android="http://schemas.android.com/apk/res/android">
-
-<TextView android:id="@+id/TextView088" android:layout_width="fill_parent" android:layout_height="5dip"
- android:text="" android:textColor="#FFFFCC" android:typeface="normal" android:layout_gravity="center_vertical|center"></TextView>
-		<ListView android:id="@android:id/list" android:layout_width="fill_parent"
-			
-			android:layout_height="0px"
-                android:layout_weight="1" 
-			>
-		</ListView>
-			<LinearLayout android:gravity="bottom"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout android:gravity="bottom"
 		android:layout_gravity="bottom" android:orientation="horizontal"
 		android:background="@drawable/toolbarbg" android:layout_width="fill_parent"
-		android:layout_height="38.0dip" android:fadingEdge="horizontal" android:animationCache="true"
-		 android:addStatesFromChildren="true">
-	
-					
-			<!--
-		<Button android:id="@+id/btn_expand_sites" android:background="@drawable/ledgreen"
-			android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_height="60.0dip" android:fadingEdge="horizontal"
+		android:animationCache="true" android:addStatesFromChildren="true">
+
+
+		<!--
+			<Button android:id="@+id/btn_expand_sites"
+			android:background="@drawable/ledgreen"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			style="@android:style/TextAppearance.Small" />
-	-->
+		-->
+
+
+
+
+
+
+		<LinearLayout android:id="@+id/LinearLayout01"
+			android:layout_height="wrap_content" android:layout_width="15px">
+		</LinearLayout>
+		<LinearLayout android:id="@+id/layoutbtnaddlib" android:orientation="vertical"
+			android:layout_height="wrap_content" android:layout_width="110dip">
+			<Button android:id="@+id/btnAddLib" android:background="@drawable/iconnewdir"
+				android:layout_x='5px' android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal|center|clip_vertical|clip_horizontal"
+				android:gravity="fill_vertical|center_horizontal|fill_horizontal|center" />
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:text="Add Library"
+				android:textColor="#FFFFCC" android:typeface="normal"
+				android:layout_gravity="center_vertical|center"></TextView>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/layoutbtnbookmark" android:orientation="vertical"
+			android:layout_height="wrap_content" android:layout_width="110dip">
+			<Button android:id="@+id/btn_bookmark" android:background="@drawable/iconbookmark"
+				android:layout_height="wrap_content" style="@android:style/TextAppearance.Small"
+				android:paddingLeft="10dip" android:shadowDx="5" android:shadowDy="5"
+				android:clickable="true" android:layout_gravity="center_horizontal|clip_horizontal"
+				android:layout_width="wrap_content" />
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:textColor="#FFFFCC"
+				android:typeface="normal" android:layout_gravity="center_vertical|center"
+				android:text="Bookmarks"></TextView>
+		</LinearLayout>
+		<LinearLayout android:id="@+id/layoutbtnlib" android:orientation="vertical"
+			android:layout_height="wrap_content" android:layout_width="110px">
+			<Button android:id="@+id/btn_home" android:background="@drawable/iconbookcase"
+				android:layout_height="wrap_content" style="@android:style/TextAppearance.Small"
+				android:paddingLeft="10dip" android:drawablePadding="5dip"
+				android:shadowDx="5" android:shadowDy="5" android:clickable="true"
+				android:layout_gravity="center_horizontal|clip_horizontal"
+				android:layout_width="wrap_content" />
+			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:textColor="#FFFFCC"
+				android:typeface="normal" android:layout_gravity="center_vertical|center"
+				android:text="Home"></TextView>
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<TextView android:id="@+id/TextView088" android:layout_width="fill_parent"
+		android:layout_height="5dip" android:text="" android:textColor="#FFFFCC"
+		android:typeface="normal" android:layout_gravity="center_vertical|center"></TextView>
+	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
+
+		android:layout_height="0px" android:layout_weight="1">
+	</ListView>
 	
-				
-			
-
-
-
-<LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:layout_width="15px">
-</LinearLayout><LinearLayout android:id="@+id/LinearLayout01" android:layout_height="wrap_content" android:layout_width="110dip"><Button android:id="@+id/btnAddLib" android:background="@drawable/btnadd"
-			android:layout_x='5px' android:layout_width="wrap_content"  android:layout_height="wrap_content" android:layout_gravity="center_horizontal|center|clip_vertical|clip_horizontal" android:gravity="fill_vertical|center_horizontal|fill_horizontal|center"/>
-<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add Library" android:textColor="#FFFFCC" android:typeface="normal" android:layout_gravity="center_vertical|center"></TextView>
-</LinearLayout>
-<LinearLayout android:id="@+id/LinearLayout02" android:layout_height="wrap_content" android:layout_width="110dip">
-<Button android:id="@+id/btn_bookmark" android:background="@drawable/btn_bookmark"
-			android:layout_height="wrap_content"
-			style="@android:style/TextAppearance.Small"  android:paddingLeft="10dip"  android:shadowDx="5" android:shadowDy="5" android:clickable="true" android:layout_gravity="center_horizontal|clip_horizontal" android:layout_width="wrap_content"/>
-			<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFCC" android:typeface="normal" android:layout_gravity="center_vertical|center" android:text="Bookmarks"></TextView>
-			</LinearLayout>
-			<LinearLayout android:id="@+id/LinearLayout03" android:layout_height="wrap_content" android:layout_width="110px">
-<Button android:id="@+id/btn_home" android:background="@drawable/btn_home"
-			android:layout_height="wrap_content"
-			style="@android:style/TextAppearance.Small"  android:paddingLeft="10dip" android:drawablePadding="5dip"  android:shadowDx="5" android:shadowDy="5" android:clickable="true" android:layout_gravity="center_horizontal|clip_horizontal" android:layout_width="wrap_content"/>
-			<TextView android:id="@+id/TextView01"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#FFFFCC" android:typeface="normal" android:layout_gravity="center_vertical|center" android:text="Home"></TextView>
-			</LinearLayout>
-			
-</LinearLayout>
-		
 
 
 </LinearLayout>
