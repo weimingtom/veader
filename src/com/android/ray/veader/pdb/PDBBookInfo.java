@@ -6,6 +6,8 @@ import android.util.Log;
 
 import org.WeaselReader.PalmIO.PalmDocDB;
 
+import com.android.ray.veader.util.EncodingConvertor;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,7 +83,9 @@ Log.d("mCount", String.valueOf(mCount));
         isProgressing = true;
         try{
             if(mFormat <2){
-                return getMyText();
+                String rtn =  getMyText();
+               
+                return rtn;
             }else{
                 return getPalmDoc();
             }
@@ -98,12 +102,8 @@ Log.d("mCount", String.valueOf(mCount));
 		ByteBuffer bodyBuffer;
 		int length = mRecodeOffset[1] - mRecodeOffset[0];
 		int startpos = mRecodeOffset[0];
-		// int _offset=22;
+	
 
-		startpos = startpos;
-		length = length;
-		Log.d("startpos!x!!", String.valueOf(startpos));
-		Log.d("length!!x!", String.valueOf(length));
 		bodyBuffer = channel.map(MapMode.READ_ONLY, startpos, length).order(
 				ByteOrder.BIG_ENDIAN);
 		byte[] tmpCache = new byte[bodyBuffer.capacity()];
@@ -112,6 +112,7 @@ Log.d("mCount", String.valueOf(mCount));
 
 	
 		str = cleantoc(str);
+		str = replaceString(str);
 		String[] _strlist = str.split("\n");
 		return _strlist;
 
@@ -230,6 +231,9 @@ Log.d("mCount", String.valueOf(mCount));
         String result = body.toString();
         result = result.replaceAll("\\\\Sd=\\\".*\\\"|\\\\(Sd|Fn|Cn|[TwQq])=\".*\"|\\\\((Sp|Sb|Sd|Fn)|[pxcriuovtnsbqlBkI\\-])", "")
         .replace("\\\\", "\\");
+       // EncodingConvertor conv;
+       // conv = new EncodingConvertor();
+       // result = conv.convert(result, 0);
         return replaceString(result);
         
     }
