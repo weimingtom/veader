@@ -70,7 +70,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 
-public class LibraryList extends ListActivity implements SimpleGestureListener {
+public class LibraryList extends ListActivity  {
 
 	public class _cursorAdapter extends CursorAdapter {
 
@@ -451,42 +451,41 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 		this.setListAdapter(_libcursorAdapter);
 
 		getListView().setOnCreateContextMenuListener(this);
-		final Button btnAdd = (Button) findViewById(R.id.btnAddLib);
-		final Button btnBookMark = (Button) findViewById(R.id.btn_bookmark);
-		final Button btnHome = (Button) findViewById(R.id.btn_home);
-		final LinearLayout loAdd = (LinearLayout) findViewById(R.id.layoutbtnaddlib);
-		final LinearLayout loBookmark = (LinearLayout) findViewById(R.id.layoutbtnbookmark);
-		final LinearLayout loLib = (LinearLayout) findViewById(R.id.layoutbtnlib);
-		loAdd.setOnClickListener(new View.OnClickListener() {
+		 Button btnAdd = (Button) findViewById(R.id.btnAddLib);
+		 Button btnBookMark = (Button) findViewById(R.id.btn_bookmark);
+		 Button btnHome = (Button) findViewById(R.id.btn_home);
+		//final LinearLayout loAdd = (LinearLayout) findViewById(R.id.layoutbtnaddlib);
+	//	final LinearLayout loBookmark = (LinearLayout) findViewById(R.id.layoutbtnbookmark);
+		//final LinearLayout loLib = (LinearLayout) findViewById(R.id.layoutbtnlib);
+		btnAdd.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
 				Intent intent = new Intent();
 
 				intent.setClassName(LibraryList.this, DirectoryBrowser.class
 						.getName());
-				// startActivity(intent);
+			Log.d("addoncick","");
 				LibraryList.this.startActivityForResult(intent, REQUEST_ADDLIB);
 
 			}
 		});
 
-		loBookmark.setOnClickListener(new View.OnClickListener() {
+		btnBookMark.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-
+				Log.d("bmkonclick","");
 				LibraryList.this.listAllBookMark();
 			}
 		});
 
-		loLib.setOnClickListener(new View.OnClickListener() {
+		btnHome.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-
+				Log.d("home","");
 				LibraryList.this.showLib();
 			}
 		});
 		ListView list = this.getListView();
 
-		Log.d("extra?", String.valueOf(getIntent().getExtras()));
-		Log.d("got action?", String.valueOf(getIntent().getExtras()));
+	
 		if (getIntent().getExtras() != null
 				&& getIntent().getExtras().containsKey("ACTION")) {
 
@@ -504,6 +503,7 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 		this._bookmarkcursorAdapter = new bookmarkCursorAdapter(this,
 				bookmarkCursor);
 		setListAdapter(_bookmarkcursorAdapter);
+		
 
 	}
 
@@ -588,11 +588,7 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 		return null;
 	}
 
-	@Override
-	public void onDoubleTap() {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		int selectedRow = (int) id;
@@ -693,10 +689,6 @@ public class LibraryList extends ListActivity implements SimpleGestureListener {
 		return true;
 	}
 
-	@Override
-	public void onSwipe(int direction) {
-		// TODO Auto-generated method stub
 
-	}
 
 }
