@@ -9,7 +9,7 @@ var SimpleReader = {
       direction: "vertical",
       width: window.innerWidth/1-5,
       height: window.innerHeight/1+20,
-      fontSize: 16,
+      fontSize: 18,
       fontFamily: "IPA明朝, ＭＳ 明朝, Hiragino Mincho Pro",
       charImgRoot:"./img"
     };

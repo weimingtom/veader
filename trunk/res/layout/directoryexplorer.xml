@@ -35,15 +35,14 @@ style="@android:style/TextAppearance.Medium"
 android:id="@+id/widget66"
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
-android:background="#ff333333"
-android:padding="5dip"
->
+android:padding="5dip" android:background="@drawable/bgpath">
 <TextView
 android:id="@+id/currentfolder"
 
 android:layout_width="fill_parent"
 android:layout_height="wrap_content"
 android:text=""
+
 android:textColor="#FFFBF1"></TextView>
 </LinearLayout>
 

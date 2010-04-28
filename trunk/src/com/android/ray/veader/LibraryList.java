@@ -38,6 +38,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -59,6 +60,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -117,18 +120,20 @@ public class LibraryList extends ListActivity  {
 		}
 
 		public void bindView(View view, Context context, Cursor cursor) {
-			// super.bindView(view, context, cursor);
-
-			// int bookscount =
+			
+		
 			// application.getDataHelper().getBookCountByCatalogid(cursor.getInt(cursor.getColumnIndex(CatalogColumn._ID)));
 			View v = view;
 			if (v == null) {
 				LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				v = vi.inflate(R.layout.row_library, null);
 			}
-
+	
+			v.setBackgroundResource(R.drawable.bgbrown);
 			tt = (TextView) v.findViewById(R.id.toptext);
 			bt = (TextView) v.findViewById(R.id.bottomtext);
+			int intFontColor = Color.rgb(240, 255, 217);
+			bt.setTextColor(intFontColor);
 			txtRemark = (TextView) v.findViewById(R.id.txtRemark);
 			viewIcon = (ImageView) v.findViewById(R.id.rowicon);
 			String bookmarktitle = cursor.getString(cursor
@@ -143,29 +148,39 @@ public class LibraryList extends ListActivity  {
 					.getColumnIndex(BookmarkColumn.TOTALPAGE));
 
 			float percent = (float) pageno / (float) totalPage;
-			long createdate = cursor.getLong(cursor
-					.getColumnIndex(BookmarkColumn.CREATEDATE));
+			String createdate = cursor.getString((cursor
+					.getColumnIndex(BookmarkColumn.CREATEDATE)));
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					"yyyy-MM-dd HH:mm:ss"); // set the format to sql date time
-			Date date = new Date(createdate);
-			String strDt = dateFormat.format(date).toString();
-
+			//Date date = new Date(createdate);
+		
 			String strpercent = "Chapter:"+String.valueOf(strChapter)+" (" +String.valueOf(Math.round((percent * 100)))
-					+ "%)";
-			String strRemark = strpercent + "-Create date:" + strDt;
+					+ "%)"+createdate;
+			//String strRemark = strpercent + "-Create date:" + strDt;
 			viewIcon.setImageResource(R.drawable.btn_bookmark);
 			if (tt != null) {
-				tt.setText(bookmarktitle);
+				tt.setText(szfont(bookmarktitle, 8));
 			}
 			if (bt != null) {
-				bt.setText(strpercent);
+				bt.setText(Html.fromHtml("<font size='7'>"+ strChapterTitle.trim()+"</font>"));
+				bt.setTextSize(15);
+			
 			}
 			if (strChapterTitle==null)strChapterTitle="";
 			if (txtRemark != null)
-				txtRemark.setText(strChapterTitle.trim());
+				txtRemark.setText(szfont(strpercent,8));
+			txtRemark.setTextSize(11);
+			 intFontColor = Color.rgb(255, 255, 153);
+			txtRemark.setTextColor(intFontColor);
+			tt.setTextSize(12);
+	
+			
 
 		}
-
+private Spanned szfont(String str, int fontsize){
+	
+	return Html.fromHtml("<font style='font-size:"+String.valueOf(fontsize)+"px'>"+str+"</font>");
+}
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			LayoutInflater inflater = LayoutInflater.from(context);
@@ -388,7 +403,8 @@ public class LibraryList extends ListActivity  {
 	public void showLib() {
 		libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
 				null, CatalogColumn.DEFAULT_SORT_ORDER);
-		this.setListAdapter(new LibCursorAdapter(this, libCursor));
+		this._libcursorAdapter = new LibCursorAdapter(this, libCursor);
+		this.setListAdapter(_libcursorAdapter);
 	}
 
 	@Override
@@ -396,6 +412,7 @@ public class LibraryList extends ListActivity  {
 		AdapterView.AdapterContextMenuInfo info;
 		try {
 			info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+			Log.d("info?" , info.toString());
 		} catch (ClassCastException e) {
 			Log.e("menu", "bad menuInfo", e);
 			return false;
