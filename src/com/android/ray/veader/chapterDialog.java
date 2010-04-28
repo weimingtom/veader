@@ -85,6 +85,7 @@ ImageView viewIcon;
 			clsChapter o = items.get(position);
 			if (o != null) {
 				viewIcon = (ImageView) v.findViewById(R.id.rowicon);
+				viewIcon.setImageResource(R.drawable.ledgreen);
 				if (tt != null) {
 					tt.setText(o.getTitle());
 				}

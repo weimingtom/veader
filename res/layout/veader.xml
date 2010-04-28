@@ -22,7 +22,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
 
-    >
+    android:background="@color/red">
     
 
     
@@ -38,21 +38,21 @@
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:stretchColumns="1"  android:id="@+id/tablebottom"
 			    android:background="@+drawable/toolbarreader"
-			>
-			<TableRow>
+			android:layout_gravity="bottom">
+			<TableRow android:layout_gravity="bottom" android:fadingEdge="vertical" android:gravity="bottom">
 
 				<TextView android:gravity="left" android:id="@+id/txtbottomleft"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:singleLine="true" android:includeFontPadding="false"
-					style="@android:style/TextAppearance.Medium" android:textSize="16sp"/>
+					style="@android:style/TextAppearance.Small" android:textSize="13sp" android:layout_gravity="center_vertical"/>
 						<TextView android:gravity="center" android:id="@+id/txtbottomcenter"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:singleLine="true" android:includeFontPadding="false"
-					style="@android:style/TextAppearance.Medium" android:textSize="16sp"/>
+					style="@android:style/TextAppearance.Medium" android:textSize="13sp" android:layout_gravity="bottom|center_vertical" android:layout_marginTop="1dip"/>
 				<TextView android:gravity="right" android:id="@+id/txtbottomright"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
-					android:singleLine="true" android:includeFontPadding="false"
-					style="@android:style/TextAppearance.Medium" android:textSize="16sp"/><!--
+					android:includeFontPadding="false"
+					style="@android:style/TextAppearance.Medium" android:textSize="13sp" android:singleLine="false" android:layout_gravity="center_vertical"/><!--
 						<Button android:id="@+id/btnTest" android:background="@drawable/add"
 			android:layout_width="wrap_content" android:layout_height="wrap_content" />
 			-->
