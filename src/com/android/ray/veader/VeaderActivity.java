@@ -710,7 +710,7 @@ private int preffontcolor;
 		preffontcolor = prefs.getInt("fontcolor", 0);
 		
 		
- preffontsize = prefs.getString("fontsize", "0");
+ preffontsize = prefs.getString("fontsize", "17");
 Log.d("fontsize?", preffontsize);
 Log.d("fontcolor?", String.valueOf(preffontcolor));
 String fontcolor = Integer.toHexString(preffontcolor).toString();
