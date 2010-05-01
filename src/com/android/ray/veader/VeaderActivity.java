@@ -27,6 +27,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -35,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -123,6 +125,8 @@ private String bookpath;
 
 	private static final int diag_goto = 4;
 	private static final int diag_chapter = 5;
+private String preffontsize, jsTextPref;
+private int preffontcolor;
 /*	final class DemoJavaScriptInterface {
 
 		DemoJavaScriptInterface() {
@@ -149,8 +153,7 @@ private String bookpath;
 
 		// automatically done on worker thread (separate from UI thread)
 		protected String doInBackground(final CharSequence... args) {
-			// List<String> names =
-			// VeaderActivity.this.application.getDataHelper().selectAll();
+
 			String paramTxt = args[0].toString();
 			int pos;
 			if (args.length == 1) {
@@ -158,8 +161,7 @@ private String bookpath;
 			} else {
 				pos = Integer.parseInt(args[1].toString());
 			}
-			// paramTxt = this.wrap(paramTxt, 27, null, true);
-			// Log.d("settextactivity", paramTxt);
+		
 			VeaderActivity.this.settext(args[0], pos);
 
 			return "";
@@ -181,65 +183,7 @@ private String bookpath;
 			this.dialog.show();
 		}
 
-		public String wrap(String str, int wrapLength, String newLineStr,
-				boolean wrapLongWords) {
-			if (str == null) {
-				return null;
-			}
-			if (newLineStr == null) {
-				newLineStr = "\n";
-			}
-			if (wrapLength < 1) {
-				wrapLength = 1;
-			}
-			int inputLineLength = str.length();
-			int offset = 0;
-			StringBuffer wrappedLine = new StringBuffer(inputLineLength + 32);
-
-			while ((inputLineLength - offset) > wrapLength) {
-				if (str.charAt(offset) == ' ') {
-					offset++;
-					continue;
-				}
-				int spaceToWrapAt = str.lastIndexOf(' ', wrapLength + offset);
-
-				if (spaceToWrapAt >= offset) {
-					// normal case
-					wrappedLine.append(str.substring(offset, spaceToWrapAt));
-					wrappedLine.append(newLineStr);
-					offset = spaceToWrapAt + 1;
-
-				} else {
-					// really long word or URL
-					if (wrapLongWords) {
-						// wrap really long word one line at a time
-						wrappedLine.append(str.substring(offset, wrapLength
-								+ offset));
-						wrappedLine.append(newLineStr);
-						offset += wrapLength;
-					} else {
-						// do not wrap really long word, just extend beyond
-						// limit
-						spaceToWrapAt = str.indexOf(' ', wrapLength + offset);
-						if (spaceToWrapAt >= 0) {
-							wrappedLine.append(str.substring(offset,
-									spaceToWrapAt));
-							wrappedLine.append(newLineStr);
-							offset = spaceToWrapAt + 1;
-						} else {
-							wrappedLine.append(str.substring(offset));
-							offset = inputLineLength;
-						}
-					}
-				}
-			}
-
-			// Whatever is left in line is short enough to just pass through
-			wrappedLine.append(str.substring(offset));
-
-			return wrappedLine.toString();
-		}
-
+		
 	}
 
 	private class loadContentTaskLast extends
@@ -249,11 +193,9 @@ private String bookpath;
 
 		// automatically done on worker thread (separate from UI thread)
 		protected String doInBackground(final CharSequence... args) {
-			// List<String> names =
-
+			
 			String paramTxt = args[0].toString();
-			// paramTxt = this.wrap(paramTxt, 27, null, true);
-			// Log.d("settextactivity", paramTxt);
+	
 			VeaderActivity.this.settext(args[0], 100);
 
 			return "";
@@ -316,11 +258,7 @@ private String bookpath;
 
 			txtpageno.setText(String.valueOf(VeaderActivity.this.pageno) + "/"
 					+ String.valueOf(VeaderActivity.this.totalPage));
-			// int ib =
-			// Settings.System.getInt(getContext().getContentResolver(),
-			// Settings.System.SCREEN_BRIGHTNESS,100);
-
-			// seek.setProgress(ctx.);
+			
 			Button btnGoto = (Button) findViewById(R.id.btngotopage);
 
 			btnGoto.setOnClickListener(new View.OnClickListener() {
@@ -341,12 +279,7 @@ private String bookpath;
 				// @override
 				public void onProgressChanged(SeekBar seekbar, int i,
 						boolean flag) {
-					/*
-					 * WindowManager.LayoutParams lp =
-					 * getOwnerActivity().getWindow().getAttributes();
-					 * lp.screenBrightness = Math.max(5,i)/255f;
-					 * getOwnerActivity().getWindow().setAttributes(lp);
-					 */
+				
 					menuVeaderActivity.this.selectedPage = (i == 0) ? 1 : i;
 					int seekpos = menuVeaderActivity.this.selectedPage;
 					Log.d("seekpos", String
@@ -409,8 +342,7 @@ private String bookpath;
 					this.previousPage();
 				} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
 						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-					// debug("left to right");
-					// this.previousPage();
+				
 					nextPage();
 
 				}
@@ -422,7 +354,6 @@ private String bookpath;
 
 		public void onLongPress(android.view.MotionEvent e) {
 
-			// debug("hi");
 			Log.d("longpress", Integer.toString(diag_Menu));
 			showDialog(diag_Menu);
 		}
@@ -543,7 +474,7 @@ private String bookpath;
 										+ "',"
 										+ String
 												.valueOf(VeaderActivity.this.fltPercent)
-										+ ");";
+										+jsTextPref+");";
 								Log
 										.d(
 												"JSCOMD",
@@ -551,7 +482,7 @@ private String bookpath;
 														+ "',"
 														+ String
 																.valueOf(VeaderActivity.this.fltPercent)
-														+ ");");
+														+jsTextPref+");");
 								mWebView.loadUrl(jsCmd);
 
 								if (offset > 0) {
@@ -612,8 +543,7 @@ private String bookpath;
 	public boolean nextChapter() {
 		isLastChapterLastPage = false;
 		Log.d("fn!dnxt page", "nxt page");
-		// new loadContentTask().execute("¦V¥ª");
-		// VeaderActivity.this.settext("¦V¥ª");
+	
 		Log.d("has next??", String.valueOf(mBook.hasNextPage()));
 		if (mBook.hasNextPage()) {
 			// mBody.setText("");
@@ -631,7 +561,6 @@ private String bookpath;
 				e.printStackTrace();
 			}
 
-			// scrollview.scrollTo(0, 0);
 		}
 		return true;
 	}
@@ -669,9 +598,6 @@ private String bookpath;
 		mWebView.setWebChromeClient(new MyWebChromeClient());
 		mWebView.setScrollContainer(isRestricted());
 
-		//mWebView.addJavascriptInterface(new DemoJavaScriptInterface(), "demo");
-
-		// tablebottom.setBackgroundColor(150);
 		mWebView.loadUrl("file:///android_asset/view.html");
 		mWebView.setVerticalScrollBarEnabled(false);
 
@@ -691,8 +617,7 @@ private String bookpath;
 
 		mWebView.setOnTouchListener(gestureListener);
 
-		// final Button btnTest = (Button) findViewById(R.id.btnTest);
-
+		
 		HandlerThread thread = new HandlerThread("reader");
 		thread.start();
 		pHandler = new Handler(thread.getLooper());
@@ -780,7 +705,19 @@ private String bookpath;
 
 			}
 		});
-
+		SharedPreferences prefs = PreferenceManager
+		.getDefaultSharedPreferences(this.getBaseContext());
+		preffontcolor = prefs.getInt("fontcolor", 0);
+		
+		
+ preffontsize = prefs.getString("fontsize", "0");
+Log.d("fontsize?", preffontsize);
+Log.d("fontcolor?", String.valueOf(preffontcolor));
+String fontcolor = Integer.toHexString(preffontcolor).toString();
+fontcolor = "#"+ fontcolor.substring(2);
+Log.d("fontcolor?",  fontcolor);
+this.jsTextPref = ","+preffontsize+",'"+fontcolor+"'";
+Log.d("jscmd", this.jsTextPref);
 	}
 
 	// @override
@@ -1028,16 +965,7 @@ private String bookpath;
 	}
 
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		/*
-		 * MenuItem rotationIgtem = menu.getItem(MENU_ROTATAION); if
-		 * (getRequestedOrientation() ==
-		 * ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {
-		 * rotationIgtem.setTitle(R.string.menu_lock); } else {
-		 * rotationIgtem.setTitle(R.string.menu_unlock); }
-		 */
-		// MenuItem formatItem = menu.getItem(MENU_FORMAT);
-		// formatItem.setEnabled(mBook.supportFormat());
-
+		
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -1094,8 +1022,7 @@ private String bookpath;
 
 	private void setPageTitle() {
 
-	//	txtbottomright.setText("Chapter" + (mBook.mPage) + "/"
-		//		+ mBook.getPageCount());
+
 		String chapterName;
 		
 		chapterName=(mBook.mPage >0)? mBook.mChapterTitles [mBook.mPage -1]:"";
@@ -1103,11 +1030,15 @@ private String bookpath;
 	}
 
 	final void settext(CharSequence strtxt) {
+		
+		
+	
+		
 		Log.d("settext", String.valueOf(mBook.mPage));
 		String strParam = strtxt.toString().replace("úD", "").replace("\n\n\n",
 				"\n\n");
 		mWebView.loadUrl("javascript:settext('"
-				+ strParam.toString().replace("\n", ":br:") + "',0);");
+				+ strParam.toString().replace("\n", ":br:") + "',0"+jsTextPref+");");
 
 	}
 
@@ -1119,7 +1050,7 @@ private String bookpath;
 		// strParam.toString().replace("\n", ":br:") + "',100);");
 		mWebView.loadUrl("javascript:settext('"
 				+ strParam.toString().replace("\n", ":br:") + "',"
-				+ String.valueOf(pos) + ");");
+				+ String.valueOf(pos) +jsTextPref+");");
 
 	}
 

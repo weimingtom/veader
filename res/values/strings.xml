@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="prefTitle">My Preferences</string>
+    <string name="prefSummary">Set Veader Option Preferences</string>
+    <string name="flight_sort_option_default_value">1</string>
+    <string name="dialogTitle">Choose Font Size</string>
+    <string name="listSummary">Font Size</string>
+    <string name="listTitle">Font Sizes</string>
+    <string name="selected_flight_sort_option">selected_flight_sort_option</string>
+    <string name="menu_prefs_title">Settings</string>
+    <string name="menu_quit_title">Quit</string>
+    <string name="title_fontcolor">Font Color</string>
+
 	<string name="app_name">Veader</string>
 	<string name="menu_text_size">Text Size</string>
 	<string name="default_charset">Default Charset</string>
@@ -12,6 +24,7 @@
 	<string name="menu_brightness">Brightness</string>
 	<string name="menu_sort">Sort</string>
 	<string name="menu_about">About</string>
+	<string name="menu_pref">Preference</string>
 	<string name="menu_color">Color</string>
 	<string name="menu_exit">Exit</string>
 	<string name="menu_catalog">Catalog</string>

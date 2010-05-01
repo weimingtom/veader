@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is /res/xml/flightoptions.xml -->
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="flight_option_preference"
+    android:title="@string/prefTitle"
+    android:summary="@string/prefSummary">
+
+  <ListPreference
+    android:key="fontsize"
+    android:title="@string/listTitle"
+    android:summary="@string/listSummary"
+    android:entries="@array/font_size"
+    android:entryValues="@array/font_size_val"
+    android:dialogTitle="@string/dialogTitle"
+    android:defaultValue="15" />
+
+    <com.android.ray.widget.CustomPreference
+            android:key="fontcolorPref"
+            android:title="Font Color"
+            android:summary="Customize font color"
+            android:defaultValue="0" />   
+</PreferenceScreen>
+

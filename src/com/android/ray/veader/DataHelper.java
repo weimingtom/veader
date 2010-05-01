@@ -111,8 +111,9 @@ public class DataHelper {
 	   }
 
    public int getBookCountByCatalogid(int catid){
-
-	    
+	    OpenHelper openHelper = new OpenHelper(this.context);
+	    if(!this.db.isOpen()) this.db = openHelper.getWritableDatabase();
+	 //   db.openOrCreateDatabase(file, factory)
 	    Cursor cursor = this.db.rawQuery("select count(*) as count  from books where catalogid =  "+catid, null);
 	cursor.moveToNext();
 	    return (cursor.getInt(0));

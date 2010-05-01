@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+ android:id="@+id/custompref"
+ android:orientation="vertical"
+ android:layout_width="wrap_content"
+    android:layout_height="fill_parent">
+ <LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="wrap_content"
+     android:layout_height="fill_parent">
+  <LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="wrap_content"
+     android:layout_height="fill_parent"
+     android:background="@color/white">
+   <TextView
+     android:id="@+id/txtfontcolorday"
+     android:layout_width="wrap_content"
+     android:layout_height="fill_parent"
+     android:layout_gravity="center_vertical"
+     android:layout_marginRight="25sp"
+     android:text="文"
+     android:textSize="40sp"
+     android:focusable="false"
+     android:clickable="false" android:textColor="@color/black"/>
+  </LinearLayout>
+  <LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="wrap_content"
+     android:layout_height="fill_parent" android:background="@color/black">
+   <TextView
+     android:id="@+id/txtfontcolornight"
+     android:layout_width="wrap_content"
+     android:layout_height="fill_parent"
+     android:layout_gravity="center_vertical"
+     android:layout_marginRight="25sp"
+     android:text="字"
+     android:textSize="40sp"
+     android:focusable="false"
+     android:clickable="false"  android:textColor="@color/white"/>
+  </LinearLayout>
+  </LinearLayout>
+</LinearLayout>

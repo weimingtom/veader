@@ -238,7 +238,8 @@ if(!Nehan.ParserHook){
       charImgRoot: "/img/char",
       charImgMap:[],
       charImgColor:"black",
-      kinsokuCharCount:2
+      kinsokuCharCount:2,
+	  color:"black"
     }, option);
     
     if (typeof option.fontFamily != "undefined"){
@@ -262,7 +263,7 @@ if(!Nehan.ParserHook){
     this.letterHeight = (this.isV)? this.fontSize + this.baseLetterSpacing : 1;
     this.wrapTag = (this.isV)? "table" : "div";
     this.rubyFontSize = Math.floor(this.fontSize / 2); // half size of main text font size.
-
+//this.color="#FFFFFF";
     if (this.isV){
       this.lineCount = Math.floor(this.height / this.letterHeight) - this.kinsokuCharCount;
     } else {
@@ -280,6 +281,7 @@ if(!Nehan.ParserHook){
     this.wrapCss += "font-size:" + this.fontSize + "px;";
     this.wrapCss += "width:" + this.width + "px;";
     this.wrapCss += "height:" + this.height + "px;";
+	this.wrapCss += "color:" + this.color + ";";
     this.wrapCss += "overflow:hidden;";
     this.wrapCss += "white-space:nowrap;"; // when tail NG happend, disable auto newline even if over flow layout size.
     
@@ -567,7 +569,8 @@ this.customwidth = 23;
       case "〕" : case "]"  : case "〕" : c = "kakko14.gif"; break;
       case "【" : c = "kakko17.gif"; break;
       case "】" : c = "kakko18.gif"; break;
-      case "?":  case "。" : c = "kuten.gif"; break;
+      //case "?":  case "。" : c = "kuten.gif"; break;
+	  case "?":  case "。" : c = "。"; break;
       case "．" :  case "."  : c = "kuten2.gif"; break;
      //case "﹑": case "、" : case ","  : case  "，" : c = "touten.gif"; break;
       case "﹑": case "、" : case ","  : case  "，" : c = "，"; break;

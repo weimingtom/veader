@@ -11,9 +11,10 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 //import com.android.lee.pdbreader.SoftwarePassionView.OrderAdapter;
-import com.android.ray.veader.R;
+
 
 import com.android.ray.veader.SimpleGestureFilter.SimpleGestureListener;
 
@@ -620,13 +621,16 @@ private Spanned szfont(String str, int fontsize){
 					BookColumn.DEFAULT_SORT_ORDER);
 			if (bookCursor.moveToNext()) {
 				Intent intent = new Intent();
-				intent.putExtra("ID", id);
-				Log.d("BOOKID", String.valueOf(id));
-				Log.d("PATH", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.PATH)));
-				Log.d("ENCODE",  bookCursor.getString(bookCursor.getColumnIndex(BookColumn.ENDCODE)));
-				// intent.setClassName(LibraryList.this, VeaderActivity.class
-				// .getName());
-				// startActivity(intent);
+				if(Pattern.matches("(.*)([.]txt?|TXT?)$", 
+						bookCursor.getString(bookCursor.getColumnIndex(BookColumn.PATH)))){
+					intent.setClassName(LibraryList.this, VeaderActivity.class
+				.getName());
+					intent.putExtra("ID", id);
+				 startActivity(intent);
+				}else{
+				
+									intent.putExtra("ID", id);
+			
 				intent.putExtra("TARGET", "READ");
 				intent.putExtra("PATH", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.PATH)));
 				intent.putExtra("ENCODE", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.ENDCODE)));
@@ -634,6 +638,7 @@ private Spanned szfont(String str, int fontsize){
 						.getName());
 				// startActivity(intent);
 				startActivity(intent);
+				}
 			}
 		} else if (isBookMarkList) {
 			Log.d("bookmark:?", String.valueOf(id));
@@ -682,7 +687,8 @@ private Spanned szfont(String str, int fontsize){
 	}
 	private static final int REQUEST_BOOKMARK = 0x126;
 	private static final int MENU_EXIT = 1;
-
+	private static final int MENU_PREF = 2;
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// menu.add(0, MENU_ZOOM, MENU_ZOOM, getResources().getString(
@@ -691,7 +697,8 @@ private Spanned szfont(String str, int fontsize){
 		// menu.add(0, MENU_COLOR, MENU_COLOR, R.string.menu_color);
 		// menu.add(0, MENU_CHARSET, MENU_CHARSET, R.string.menu_charset);
 		menu.add(0, MENU_EXIT, MENU_EXIT, R.string.menu_exit);
-
+		menu.add(0, MENU_PREF, MENU_PREF, R.string.menu_pref);
+		
 		// menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
 		return true;
 
@@ -703,6 +710,17 @@ private Spanned szfont(String str, int fontsize){
 
 			this.finish();
 		}
+		if (item.getItemId() == MENU_PREF) {
+			Intent intent = new Intent();
+			intent.putExtra("ID", "");
+			
+
+			//Log.d("BOOKID", String.valueOf(id));
+			intent.setClassName(LibraryList.this, Preferences.class
+					.getName());
+			startActivity(intent);
+		}
+		
 		return true;
 	}
 

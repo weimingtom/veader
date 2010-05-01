@@ -32,8 +32,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-
-import com.android.ray.veader.R;
 import com.android.ray.veader.util.ColorUtil;
 import com.android.ray.veader.util.Constatnts;
 
@@ -53,7 +51,6 @@ public class ColorListActivity extends ListActivity {
         }
 
     }
-
 
 
     private class MyArrayAdapter extends ArrayAdapter<String> {
