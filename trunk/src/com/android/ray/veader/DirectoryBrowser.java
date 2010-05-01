@@ -35,7 +35,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 
-import com.android.ray.veader.R;
+
 import com.android.ray.veader.pdb.AbstractBookInfo;
 import com.android.ray.veader.provider.BookColumn;
 import com.android.ray.veader.util.Constatnts;
@@ -165,7 +165,7 @@ public class DirectoryBrowser extends ListActivity {
 			for (File _f : file.listFiles()) {
 				if (!_f.isDirectory()) {
 					String _filename = _f.getName().toString().trim();
-					if (Pattern.matches("(.*)([.]pdb?|PDB?)$", _filename)) {
+					if (Pattern.matches("(.*)([.]pdb?|PDB?|txt?|TXT?)$", _filename)) {
 						// book = new Books();
 
 						// int catid= (catid.)?0:catid;
@@ -267,7 +267,7 @@ public class DirectoryBrowser extends ListActivity {
 					_lib.setpath(file.getPath());
 					_library.add(_lib);
 				}
-				if (Pattern.matches("(.*)([.]pdb?|PDB?)$", file.getName()
+				if (Pattern.matches("(.*)([.]pdb?|PDB?|txt?|TXT?)$", file.getName()
 						.trim())) {
 					pdbcount++;
 				}

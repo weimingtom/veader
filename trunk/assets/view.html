@@ -51,13 +51,13 @@ table.padded-table td {
        // SimpleReader.start({direction:"vertical-rl", charImgRoot:"./img"});
 	  // settext('', 100);
       })
-	  	function settext(str, pos){
+	  	function settext(str, pos, _fontsize, _color){
 
 		//  $(".tmp-hide").text(str.replace(/:br:/gi, "\n"));
 		sourceText = str.replace(/:br:/gi, "\n");
 	$('#source-text').html(sourceText)
 	
-	 SimpleReader.start({direction:"vertical-rl", charImgRoot:"./img"});
+	 SimpleReader.start({direction:"vertical-rl", charImgRoot:"./img", fontSize:_fontsize, color:_color});
 	 if (pos==100){
 	SimpleReader.write(SimpleReader.totalPage/1-1);
 	SimpleReader.pageNo = (SimpleReader.totalPage/1-1)

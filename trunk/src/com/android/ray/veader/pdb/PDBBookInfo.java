@@ -240,11 +240,17 @@ Log.d("mCount", String.valueOf(mCount));
     
     
     private String replaceString(String str){
-        return str.replace("\r", "").replace("¡@", " ").replace('¡w', '¡u')
+    /*    return str.replace("\r", "").replace("¡@", " ").replace('¡w', '¡u')
       .replace('¡x', '¡v').replace('¡{', '¡y').replace('¡|', '¡z').replace('¡o','¡m').replace('¡p', '¡n')
       .replace('¡W', '¡V').replace('¡_', '(').replace('¡`', ')').replace('¡c', '{').replace('¡d', '}')
       .replace('¡k', '¡i').replace('¡l', '¡j').replace('¡s', '¡q').replace('¡t', '¡r').replace('¡d', '}')
       .replace((char) 0x1B, '\t').replace('¡U', '¡X').replace('¡g', '¡e').replace('¡h','¡f').replace("\0","");
+*/
+        return str.replace("\r", "").replace("¡@", " ").replace('¡w', '¡w')
+        .replace('¡x', '¡x').replace('¡{', '¡y').replace('¡|', '¡z').replace('¡o','¡m').replace('¡p', '¡n')
+        .replace('¡W', '¡V').replace('¡_', '(').replace('¡`', ')').replace('¡c', '{').replace('¡d', '}')
+        .replace('¡k', '¡k').replace('¡l', '¡l').replace('¡s', '¡q').replace('¡t', '¡r').replace('¡d', '}')
+        .replace((char) 0x1B, '\t').replace('¡U', '¡X').replace('¡g', '¡e').replace('¡h','¡f').replace("\0","");
 
      }
 

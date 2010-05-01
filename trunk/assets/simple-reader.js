@@ -11,7 +11,8 @@ var SimpleReader = {
       height: window.innerHeight/1+20,
       fontSize: 18,
       fontFamily: "IPA明朝, ＭＳ 明朝, Hiragino Mincho Pro",
-      charImgRoot:"./img"
+      charImgRoot:"./img",
+	  color:"#000000"
     };
     for(var prop in defopt){
       this[prop] = (opt[prop])? opt[prop] : defopt[prop];
@@ -26,7 +27,8 @@ var SimpleReader = {
       height: this.height,
       fontSize: this.fontSize,
       fontFamily: this.fontFamily,
-      charImgRoot: this.charImgRoot
+      charImgRoot: this.charImgRoot,
+	  color:this.color
     }), new Nehan.TextStream(text, text.length, true));
 
     document.getElementById("pager-next").onclick = function(){ self.next(); return false; };

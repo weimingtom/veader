@@ -38,8 +38,6 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-//import com.android.ray.veader.R;
-import com.android.ray.veader.R;
 import com.android.ray.veader.provider.BookColumn;
 import com.android.ray.veader.util.Constatnts;
 import com.android.ray.veader.util.DBUtil;
