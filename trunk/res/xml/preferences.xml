@@ -5,20 +5,27 @@
     android:key="flight_option_preference"
     android:title="@string/prefTitle"
     android:summary="@string/prefSummary">
-
+ <ListPreference
+    android:key="locale"
+    android:title="@string/pref_localetitle"
+    android:summary="@string/pref_localesummary"
+    android:entries="@array/locale"
+    android:entryValues="@array/locale_val"
+    android:dialogTitle="@string/pref_localedialogtitle"
+    android:defaultValue="zh_TW" />
   <ListPreference
     android:key="fontsize"
-    android:title="@string/listTitle"
-    android:summary="@string/listSummary"
+    android:title="@string/pref_fontsizeTitle"
+    android:summary="@string/pref_fontsizeSummary"
     android:entries="@array/font_size"
     android:entryValues="@array/font_size_val"
-    android:dialogTitle="@string/dialogTitle"
-    android:defaultValue="15" />
+    android:dialogTitle="@string/pref_fontdialogTitle"
+    android:defaultValue="16" />
 
     <com.android.ray.widget.CustomPreference
-            android:key="fontcolorPref"
-            android:title="Font Color"
-            android:summary="Customize font color"
-            android:defaultValue="0" />   
+            android:key="fontcolor"
+            android:title="@string/title_fontcolor"
+            android:summary="@string/pref_setfontcolor"
+            android:defaultValue="-16777216" />   
 </PreferenceScreen>
 
