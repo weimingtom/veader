@@ -306,7 +306,7 @@ private Spanned szfont(String str, int fontsize){
 			if (bt != null) {
 				bt.setText(libdesc);
 			}
-			txtRemark.setText("(" + Integer.toString(bookscount) + " books)");
+			txtRemark.setText("(" + Integer.toString(bookscount) + " " +getString(R.string.strfileunit)+")");
 		}
 
 		@Override
@@ -318,24 +318,29 @@ private Spanned szfont(String str, int fontsize){
 
 		}
 	}
+	public static final int MENU_ITEM_DELETE = Menu.FIRST;
+	public static final int MENU_ITEM_INSERT = Menu.FIRST + 1;
 
+	private static final int ENCODE_DIALOG = 3;
+	private static final int diag_confirmdelete = 1;
+
+	private static final int diag_Menu = 0;
+
+	private static final int diag_goto = 4;
 	private List<String> items = null;
 	String dbpath, dbname, dblocation;
 	TextView textCurrentFolder;
 	private MyApplication application;
 	private ProgressDialog m_ProgressDialog = null;
 
-	// private ArrayList<Library> _library = null;
-	// private ArrayList<Books> _booklist = null;
-	// private libraryAdapter m_adapter;
-	// private BooksAdapter _bookAdapter;
+
 	private bookCursorAdapter _bookcursorAdapter;
 	private LibCursorAdapter _libcursorAdapter;
 	private bookmarkCursorAdapter _bookmarkcursorAdapter;
 	Thread thread;
 	private Cursor libCursor, bookCursor, bookmarkCursor;
-	private SimpleGestureFilter filter;
-	private GestureDetector gestureDetector;
+//	private SimpleGestureFilter filter;
+	//private GestureDetector gestureDetector;
 
 	View.OnTouchListener gestureListener;
 
@@ -358,16 +363,7 @@ private Spanned szfont(String str, int fontsize){
 
 	};
 
-	public static final int MENU_ITEM_DELETE = Menu.FIRST;
-	public static final int MENU_ITEM_INSERT = Menu.FIRST + 1;
 
-	// dial
-	private static final int ENCODE_DIALOG = 3;
-	private static final int diag_confirmdelete = 1;
-
-	private static final int diag_Menu = 0;
-
-	private static final int diag_goto = 4;
 
 	public void debug(String msg) {
 
@@ -441,7 +437,6 @@ private Spanned szfont(String str, int fontsize){
 				int result = getContentResolver().delete(pdbUri, "", null);
 			}
 
-			// getLibraries(new File("/sdcard/"));
 			return true;
 		}
 		}
@@ -472,22 +467,32 @@ private Spanned szfont(String str, int fontsize){
 		 Button btnAdd = (Button) findViewById(R.id.btnAddLib);
 		 Button btnBookMark = (Button) findViewById(R.id.btn_bookmark);
 		 Button btnHome = (Button) findViewById(R.id.btn_home);
-		//final LinearLayout loAdd = (LinearLayout) findViewById(R.id.layoutbtnaddlib);
-	//	final LinearLayout loBookmark = (LinearLayout) findViewById(R.id.layoutbtnbookmark);
-		//final LinearLayout loLib = (LinearLayout) findViewById(R.id.layoutbtnlib);
-		btnAdd.setOnClickListener(new View.OnClickListener() {
+		 Button btnpref = (Button) findViewById(R.id.btn_pref);
+		 btnpref.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
 				Intent intent = new Intent();
+				intent.putExtra("ID", "");
+				
 
-				intent.setClassName(LibraryList.this, DirectoryBrowser.class
+				//Log.d("BOOKID", String.valueOf(id));
+				intent.setClassName(LibraryList.this, Preferences.class
 						.getName());
-			Log.d("addoncick","");
-				LibraryList.this.startActivityForResult(intent, REQUEST_ADDLIB);
-
+				startActivity(intent);
 			}
 		});
+	btnAdd.setOnClickListener(new View.OnClickListener() {
+		public void onClick(View v) {
 
+			Intent intent = new Intent();
+
+			intent.setClassName(LibraryList.this, DirectoryBrowser.class
+					.getName());
+		Log.d("addoncick","");
+			LibraryList.this.startActivityForResult(intent, REQUEST_ADDLIB);
+
+		}
+	});
 		btnBookMark.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.d("bmkonclick","");
@@ -562,8 +567,8 @@ private Spanned szfont(String str, int fontsize){
 
 					switch (item) {
 					case 0:
-						Context mContext = getApplicationContext();
-						// LibraryList.this.debug("hihi");
+				//		Context mContext = getApplicationContext();
+				
 						long id = LibraryList.this.getListView()
 								.getSelectedItemId();
 						LibraryList.this.debug(String.valueOf(id));
@@ -636,7 +641,7 @@ private Spanned szfont(String str, int fontsize){
 				intent.putExtra("ENCODE", bookCursor.getString(bookCursor.getColumnIndex(BookColumn.ENDCODE)));
 				intent.setClassName(LibraryList.this, chapterDialog.class
 						.getName());
-				// startActivity(intent);
+			
 				startActivity(intent);
 				}
 			}
@@ -673,10 +678,9 @@ private Spanned szfont(String str, int fontsize){
 			}
 		} else {
 
-			// libCursor.moveToPosition(selectedRow-1);
+	
 			Log.d("cursorpos:", String.valueOf(selectedRow));
-			// int catalogid =
-			// libCursor.getInt(libCursor.getColumnIndex(CatalogColumn._ID));
+			
 			bookCursor = managedQuery(BookColumn.CONTENT_URI, BookField,
 					"catalogid=" + String.valueOf(selectedRow), null,
 					BookColumn.DEFAULT_SORT_ORDER);
@@ -699,7 +703,6 @@ private Spanned szfont(String str, int fontsize){
 		menu.add(0, MENU_EXIT, MENU_EXIT, R.string.menu_exit);
 		menu.add(0, MENU_PREF, MENU_PREF, R.string.menu_pref);
 		
-		// menu.add(0, MENU_BOOKMARK, MENU_BOOKMARK, R.string.menu_bookmark);
 		return true;
 
 	}

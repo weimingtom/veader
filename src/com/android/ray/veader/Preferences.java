@@ -1,9 +1,12 @@
 package com.android.ray.veader;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -24,16 +27,17 @@ public class Preferences extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preferences);
-		//SharedPreferences customSharedPreference = getSharedPreferences(
-			//	"fontcolor", Activity.MODE_PRIVATE);
-		SharedPreferences colorpref =PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		
+		// SharedPreferences customSharedPreference = getSharedPreferences(
+		// "fontcolor", Activity.MODE_PRIVATE);
+		SharedPreferences colorpref = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+
 		// SharedPreferences.Editor editor = customSharedPreference.edit();
-		prefColor = colorpref.getInt("fontcolor", 0);
+		prefColor = colorpref.getInt("fontcolor", -16777216);
 
 		Log.d("fontoclor", String.valueOf(prefColor));
 
-		Preference customPref = (Preference) findPreference("fontcolorPref");
+		Preference customPref = (Preference) findPreference("fontcolor");
 		customPref
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
@@ -50,33 +54,77 @@ public class Preferences extends PreferenceActivity {
 				.getDefaultSharedPreferences(this.getBaseContext());
 		String _fontsize = prefs.getString("fontsize", "0");
 		Log.d("fontsize?", _fontsize);
+		String _locale = prefs.getString("locale", "en_US");
+		Log.d("locale?", _locale);
 		Preference prefFontsize = (Preference) findPreference("fontsize");
-		prefFontsize
-				.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		prefFontsize.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 					@Override
 					public boolean onPreferenceChange(Preference preference,
 							Object newValue) {
-						// TODO Auto-generated method stub
-						preference.setSummary("Font size" + ":"
+						
+						preference.setSummary(getString(R.string.pref_configval)
 								+ String.valueOf(newValue));
-						
-						
-						
+
 						SharedPreferences prefs = PreferenceManager
-						.getDefaultSharedPreferences(Preferences.this
-								.getBaseContext());
-				SharedPreferences.Editor editor = prefs.edit();
-				
-				editor.putString("fontsize", String.valueOf(newValue));
-				editor.commit();
-						return false;
+								.getDefaultSharedPreferences(Preferences.this
+										.getBaseContext());
+						SharedPreferences.Editor editor = prefs.edit();
+						
+						editor.putString("fontsize", String.valueOf(newValue));
+						editor.commit();
+						//editor.notifyAll();
+						
+						return true;
 
 					}
 
 				});
 		// prefFontsize.setTitle(prefFontsize.getTitle()+":"+_fontsize);
-		prefFontsize.setSummary("Font size" + ":" + _fontsize);
+		
+		Preference plocale = (Preference) findPreference("locale");
+		plocale.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+					@Override
+					public boolean onPreferenceChange(Preference preference,
+							Object newValue) {
+						// TODO Auto-generated method stub
+						preference.setSummary(getString(R.string.pref_configval)
+								+ String.valueOf(newValue));
+
+						SharedPreferences prefs = PreferenceManager
+								.getDefaultSharedPreferences(Preferences.this
+										.getBaseContext());
+						SharedPreferences.Editor editor = prefs.edit();
+
+						editor.putString("locale", String.valueOf(newValue));
+						editor.commit();
+						//editor.notifyAll();
+						
+					     //String languageToLoad = "fr-rFR";
+						String languageToLoad = (String) newValue;
+					        //Locale locale = new Locale(languageToLoad);
+					       
+					        Configuration config = new Configuration();
+					        config = new Configuration();
+							config.locale = Locale.ENGLISH;
+							if (languageToLoad.equals(Locale.TRADITIONAL_CHINESE.toString())) {
+								config.locale = Locale.TRADITIONAL_CHINESE;
+							}
+							if (languageToLoad.equals(Locale.SIMPLIFIED_CHINESE.toString())) {
+								config.locale = Locale.SIMPLIFIED_CHINESE;
+							}
+					       // config.locale = locale;
+					        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+					        
+						
+						return true;
+
+					}
+
+				});
+		// prefFontsize.setTitle(prefFontsize.getTitle()+":"+_fontsize);
+		plocale.setSummary(getString(R.string.pref_configval) + ":" + _locale);
 	}
 
 	private class _colorpicker extends ColorPickerDialog {
@@ -86,6 +134,7 @@ public class Preferences extends PreferenceActivity {
 
 			// TODO Auto-generated constructor stub
 		}
+
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -95,7 +144,6 @@ public class Preferences extends PreferenceActivity {
 
 		@Override
 		public void onColorPicked(View view, int newColor) {
-		
 
 			this.dismiss();
 			Log.d("color", String.valueOf(newColor));
@@ -104,7 +152,7 @@ public class Preferences extends PreferenceActivity {
 					.getDefaultSharedPreferences(Preferences.this
 							.getBaseContext());
 			SharedPreferences.Editor editor = prefs.edit();
-			
+
 			editor.putInt("fontcolor", newColor);
 			editor.commit();
 			TextView txtday = (TextView) Preferences.this
@@ -113,7 +161,7 @@ public class Preferences extends PreferenceActivity {
 					.findViewById(R.id.txtfontcolornight);
 			txtday.setTextColor(newColor);
 			txtnight.setTextColor(newColor);
-			
+
 		}
 
 	}

@@ -110,7 +110,7 @@ ImageView viewIcon;
       path = getIntent().getExtras().getString("PATH");
       encode = getIntent().getExtras().getString("ENCODE");
       Log.d("id", String.valueOf(bookid));
-     
+     this.setTitle(getString(R.string.title_chapter));
 		File f = new File(path);
 		mBook = AbstractBookInfo.newBookInfo(f, bookid);
 		try {
