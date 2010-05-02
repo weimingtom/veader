@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import com.android.ray.veader.R;
@@ -29,6 +30,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -271,6 +273,7 @@ private int preffontcolor;
 					Log.d("jscommand", jsCmd);
 					VeaderActivity.this.mWebView.loadUrl(jsCmd);
 					Log.d("onclick!", "");
+					dismissDialog(diag_goto);
 				}
 			});
 
@@ -290,7 +293,7 @@ private int preffontcolor;
 							.valueOf(seekpos + 1)
 							+ "/"
 							+ String.valueOf(VeaderActivity.this.totalPage));
-
+				
 				}
 
 				// @override
@@ -360,7 +363,13 @@ private int preffontcolor;
 
 		public boolean previousPage() {
 			Log.d("previous page", "previous page");
+			//Log.d("curentchapter", String.valueOf(mBook.mPage));
+			if((VeaderActivity.this.pageno==1)&&(mBook.mPage==1)){
+				return true;
+			}
+			else{
 			mWebView.loadUrl("javascript:SimpleReader.prev(1);");
+			}
 			return true;
 		}
 	}
@@ -404,7 +413,13 @@ private int preffontcolor;
 					Log.d("pageno", String.valueOf(VeaderActivity.this.pageno));
 					Log.d("totalpageno", String
 							.valueOf(VeaderActivity.this.totalPage));
-
+if(VeaderActivity.this.totalPage==1){
+	VeaderActivity.this.isLastChapterLastPage = true;
+}
+if(VeaderActivity.this.pageno==VeaderActivity.this.totalPage){
+	VeaderActivity.this.isLastChapterLastPage = true;
+	
+}
 					if (Integer.parseInt(msg[1].split("/")[0]) == 0) {
 						Log.d("msg[1]??", msg[1]);
 						Log.d("msg[1].split('/')[0]?", msg[1].split("/")[0]);
@@ -569,6 +584,13 @@ private int preffontcolor;
 	public void onCreate(Bundle icicle) {
 		// gestureScanner = new GestureDetector(this);
 		super.onCreate(icicle);
+		
+		//Log.d("loca", locale.toString());
+		Log.d("test1",getString(R.string.menu_next5));
+		SharedPreferences prefs = PreferenceManager
+		.getDefaultSharedPreferences(this.getBaseContext());
+		
+		//==========
 		setContentView(R.layout.veader);
 		mWebView = (WebView) findViewById(R.id.webview);
 		txtbottomleft = (TextView) findViewById(R.id.txtbottomleft);
@@ -584,10 +606,9 @@ private int preffontcolor;
 		//txtbottomleft.setText("bookname");
 		int intFontColor = Color.rgb(105, 60, 44);
 		txtbottomleft.setTextColor(intFontColor);
-		//txtbottomcenter.setText("Chapter");
+	
 		txtbottomcenter.setTextColor(intFontColor);
 
-	//	txtbottomright.setText("1/100");
 		txtbottomright.setTextColor(intFontColor);
 		WebSettings webSettings = mWebView.getSettings();
 		webSettings.setSavePassword(false);
@@ -705,15 +726,16 @@ private int preffontcolor;
 
 			}
 		});
-		SharedPreferences prefs = PreferenceManager
-		.getDefaultSharedPreferences(this.getBaseContext());
-		preffontcolor = prefs.getInt("fontcolor", 0);
+		//SharedPreferences prefs = PreferenceManager
+		//.getDefaultSharedPreferences(this.getBaseContext());
+		preffontcolor = prefs.getInt("fontcolor", -16777216);
 		
 		
  preffontsize = prefs.getString("fontsize", "17");
 Log.d("fontsize?", preffontsize);
 Log.d("fontcolor?", String.valueOf(preffontcolor));
 String fontcolor = Integer.toHexString(preffontcolor).toString();
+Log.d("font colorhex", fontcolor);
 fontcolor = "#"+ fontcolor.substring(2);
 Log.d("fontcolor?",  fontcolor);
 this.jsTextPref = ","+preffontsize+",'"+fontcolor+"'";
@@ -769,7 +791,7 @@ Log.d("jscmd", this.jsTextPref);
 						break;
 					case 5:
 						dismissDialog(diag_Menu);
-						//showDialog(diag_chapter);
+					
 						Intent intent = new Intent(VeaderActivity.this, chapterDialog.class);
 						
 						intent.putExtra("ID", VeaderActivity.this.bookid);
@@ -784,9 +806,9 @@ Log.d("jscmd", this.jsTextPref);
 						insertBookmark(0);
 						break;
 					}
-					// dismissDialog (diag_Menu);
-					Toast.makeText(getApplicationContext(), items[item],
-							Toast.LENGTH_SHORT).show();
+					
+				//	Toast.makeText(getApplicationContext(), items[item],
+				//			Toast.LENGTH_SHORT).show();
 					dismissDialog(diag_Menu);
 				}
 			});

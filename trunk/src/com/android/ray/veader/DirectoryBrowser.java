@@ -144,7 +144,7 @@ public class DirectoryBrowser extends ListActivity {
 		new AlertDialog.Builder(this).setTitle("hello").setMessage(msg)
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
-
+private String strRegexFileType="(.*)([.]pdb?|PDB?|txt?|TXT?)$";
 	private void InsertLibrary(final String... args) {
 
 		String _msg;
@@ -165,7 +165,10 @@ public class DirectoryBrowser extends ListActivity {
 			for (File _f : file.listFiles()) {
 				if (!_f.isDirectory()) {
 					String _filename = _f.getName().toString().trim();
-					if (Pattern.matches("(.*)([.]pdb?|PDB?|txt?|TXT?)$", _filename)) {
+					//if (Pattern.matches("(.*)([.]pdb?|PDB?|txt?|TXT?)$", _filename)) {
+						if (Pattern.matches(strRegexFileType, _filename)) {
+							
+						
 						// book = new Books();
 
 						// int catid= (catid.)?0:catid;
@@ -267,7 +270,7 @@ public class DirectoryBrowser extends ListActivity {
 					_lib.setpath(file.getPath());
 					_library.add(_lib);
 				}
-				if (Pattern.matches("(.*)([.]pdb?|PDB?|txt?|TXT?)$", file.getName()
+				if (Pattern.matches(strRegexFileType, file.getName()
 						.trim())) {
 					pdbcount++;
 				}
@@ -282,7 +285,7 @@ public class DirectoryBrowser extends ListActivity {
 		}
 		// runOnUiThread(returnRes);
 		txtbooksfound = (TextView) findViewById(R.id.txtbooksfound);
-		txtbooksfound.setText(String.valueOf(pdbcount) + " books found");
+		txtbooksfound.setText(getString(R.string.booksfound)+String.valueOf(pdbcount)  );
 		return pdbcount;
 	}
 
