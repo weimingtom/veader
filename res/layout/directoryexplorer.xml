@@ -18,7 +18,7 @@ android:orientation="horizontal"
 android:id="@+id/btnSelect"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
-android:text="Select Current Folder"
+android:text="@string/btnselectfolder"
 android:clickable="true">
 </Button>
 <TextView
