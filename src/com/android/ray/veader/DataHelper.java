@@ -24,19 +24,21 @@ public class DataHelper {
       @Override
       public void onCreate(SQLiteDatabase db) {
         // db.execSQL("CREATE TABLE " + TABLE_NAME + " (id INTEGER PRIMARY KEY, name TEXT)");
-  		db.beginTransaction();
-		db.execSQL("CREATE TABLE IF NOT EXISTS catalog (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-						+ "path varchar, name varchar, description varchar, catagoryid varchar);");
-
-		db.execSQL("CREATE TABLE IF NOT EXISTS books (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-						+ "path varchar, author varchar, description varchar, lastoffset int, lastpage int, encode varchar, " 
-						+ "name varchar, size INT, rating int, replace int, format int,wordcount int, authorid int, catalogid INT,createdate long);");
-		db.execSQL("CREATE TABLE IF NOT EXISTS author (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-						+ "name varchar, description varchar,  dob date, dod date);");
-		db.execSQL("CREATE TABLE IF NOT EXISTS bookmark (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
-						+ "name varchar, description varchar, bookid INT, pages int, dob date, dod date);");
-		db.setTransactionSuccessful();
-		db.endTransaction();
+    	  db.beginTransaction();
+  		db.execSQL("CREATE TABLE IF NOT EXISTS catalog (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+  						+ "path varchar, name varchar, description varchar, catagoryid varchar);");
+  		db.execSQL("CREATE TABLE IF NOT EXISTS books (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+  						+ "path varchar, description varchar, lastoffset int, lastpage int, encode varchar, author varchar" 
+  						+ ",name varchar, size INT, rating int, replace int, format int,wordcount int, authorid int, catalogid INT,createdate long);");
+  		db.execSQL("CREATE TABLE IF NOT EXISTS author (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+  						+ "name varchar, description varchar,  dob date, dod date);");
+  		db.execSQL("CREATE TABLE IF NOT EXISTS bookmark (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+  						+ "name varchar,totalpage numeric, description varchar, bookid INT, page int,chapter int,type int,chaptertitle varchar, createdate date default CURRENT_DATE);");
+  		db.execSQL("CREATE TABLE IF NOT EXISTS veadersys (_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT (0), "
+					+ "userlang varchar,readerlang numeric, fontsize INT, fontcolor INT, fixorientation int,version int, reserve1 int, reserve2 int, createdate date default CURRENT_DATE);");
+	
+  		db.setTransactionSuccessful();
+  		db.endTransaction();
       }
 
       @Override
@@ -62,7 +64,7 @@ public class DataHelper {
       this.context = context;
       OpenHelper openHelper = new OpenHelper(this.context);
       this.db = openHelper.getWritableDatabase();
-      //this.db = context.openOrCreateDatabase(DATABASE_NAME, context.MODE_PRIVATE, null);
+    // this.db = context.openOrCreateDatabase(DATABASE_NAME, context.MODE_PRIVATE, null);
       
    }
 
@@ -144,8 +146,6 @@ public class DataHelper {
    }
    public int getMaxLibID(){
 	   
-	    //Cursor cursor = this.db.query(TABLE_NAME, new String[] { "name" }, null, null, null, null, "name desc");
-	    
 	    
 	    
 	    Cursor cursor = this.db.rawQuery("select max(_id) as id from catalog ", null);

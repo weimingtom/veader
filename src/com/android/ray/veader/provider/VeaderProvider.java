@@ -54,6 +54,7 @@ public class VeaderProvider extends ContentProvider {
 
         //@override
         public void onCreate(SQLiteDatabase db) {
+        	
           /*  StringBuilder createSql = new StringBuilder();
             createSql.append("CREATE TABLE ");
             createSql.append(TABLE_NAME ).append("(");
@@ -92,7 +93,7 @@ public class VeaderProvider extends ContentProvider {
 	
     		db.setTransactionSuccessful();
     		db.endTransaction();
-          
+    		//db.close();
         }
 
         //@override
@@ -109,14 +110,16 @@ public class VeaderProvider extends ContentProvider {
         	//	db.endTransaction();
         //	db.close();
         	}
+        	this.onCreate(db);
         	   Cursor cursor = db.rawQuery("SELECT count(*) FROM sqlite_master WHERE  name = 'bookmark' and sql like '%chaptertitle%'", null);
         		cursor.moveToNext();
         		    if(cursor.getInt(0)==0){
         		    	
         		    	db.execSQL("alter table bookmark add column 'chaptertitle'");
-        		    	db.close();
+        		    
         		    }
-            onCreate(db);
+        			
+           // onCreate(db);
         }
     }
 
@@ -185,10 +188,13 @@ public class VeaderProvider extends ContentProvider {
         }
         // Get the database and run the query
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+       // SQLiteDatabase db =  getContext().openOrCreateDatabase(DATABASE_NAME, this.getContext().MODE_PRIVATE, null);
+      //  getContext().openOrCreateDatabase(name, mode, factory)
         Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
 
         // Tell the cursor what uri to watch, so it knows when its source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
+       // db.close();
         return c;
     }
 
@@ -275,7 +281,9 @@ public class VeaderProvider extends ContentProvider {
          }
 
 
-         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        // SQLiteDatabase db=getContext().openOrCreateDatabase(DATABASE_NAME, this.getContext().MODE_PRIVATE, null);
+         
          long rowId = db.insert(TABLE_NAME, "", values);
          if (rowId > 0) {
              Uri noteUri = ContentUris.withAppendedId(BookColumn.CONTENT_URI, rowId);
