@@ -449,7 +449,7 @@ private Spanned szfont(String str, int fontsize){
 	public void onCreate(final Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-
+//DataHelper help = new DataHelper(this.getApplicationContext());
 		setContentView(R.layout.librarylist);
 		dbname = getResources().getString(R.string.dbname).toString();
 		textCurrentFolder = (TextView) findViewById(R.id.currentfolder);
@@ -458,10 +458,7 @@ private Spanned szfont(String str, int fontsize){
 		// + dbname, dblocation);
 		this.application = (MyApplication) this.getApplication();
 
-		libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
-				null, CatalogColumn.DEFAULT_SORT_ORDER);
-		_libcursorAdapter = new LibCursorAdapter(this, libCursor);
-		this.setListAdapter(_libcursorAdapter);
+		
 
 		getListView().setOnCreateContextMenuListener(this);
 		 Button btnAdd = (Button) findViewById(R.id.btnAddLib);
@@ -517,7 +514,10 @@ private Spanned szfont(String str, int fontsize){
 				listAllBookMark();
 			}
 		}
-
+		libCursor = managedQuery(CatalogColumn.CONTENT_URI, CatalogField, null,
+				null, CatalogColumn.DEFAULT_SORT_ORDER);
+		_libcursorAdapter = new LibCursorAdapter(this, libCursor);
+		this.setListAdapter(_libcursorAdapter);
 	}
 
 	public void listAllBookMark() {

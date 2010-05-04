@@ -144,7 +144,8 @@ public class DirectoryBrowser extends ListActivity {
 		new AlertDialog.Builder(this).setTitle("hello").setMessage(msg)
 				.setIcon(0).setPositiveButton("OK", null).create().show();
 	}
-private String strRegexFileType="(.*)([.]pdb?|PDB?|txt?|TXT?)$";
+//private String strRegexFileType="(.*)([.]pdb?|PDB?|txt?|TXT?)$";
+private String strRegexFileType="(.*)([.]pdb?|PDB?)$";
 	private void InsertLibrary(final String... args) {
 
 		String _msg;
