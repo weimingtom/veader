@@ -1,10 +1,10 @@
 package org.ray.veader;
 
+import org.ray.veader.R;
 import org.ray.widget.ColorCircle;
 import org.ray.widget.ColorSlider;
 import org.ray.widget.OnColorChangedListener;
 
-import com.android.ray.veader.R;
 
 import android.app.Activity;
 import android.app.Dialog;

@@ -1,6 +1,6 @@
 package org.ray.veader;
 
-import com.android.ray.veader.R;
+import org.ray.veader.R;
 
 import android.app.Dialog;
 import android.content.Context;

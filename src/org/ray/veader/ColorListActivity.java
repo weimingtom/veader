@@ -16,6 +16,7 @@
 
 package org.ray.veader;
 
+import org.ray.veader.R;
 import org.ray.veader.util.ColorUtil;
 import org.ray.veader.util.Constatnts;
 
@@ -35,7 +36,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.android.ray.veader.R;
 
 /**
  * This example shows how to use choice mode on a list. This list is in

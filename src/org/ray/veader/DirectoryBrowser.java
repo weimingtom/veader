@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.ray.veader.R;
 import org.ray.veader.pdb.AbstractBookInfo;
 import org.ray.veader.provider.BookColumn;
 import org.ray.veader.util.Constatnts;
@@ -40,7 +41,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 
-import com.android.ray.veader.R;
 
 import android.widget.ListView;
 import android.widget.TextView;

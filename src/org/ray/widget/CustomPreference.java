@@ -2,8 +2,8 @@ package org.ray.widget;
 
 
 import org.ray.veader.Preferences;
+import org.ray.veader.R;
 
-import com.android.ray.veader.R;
 
 import android.app.Activity;
 import android.content.Context;

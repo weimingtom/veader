@@ -2,7 +2,8 @@ package org.ray.veader;
 
 import java.util.Locale;
 
-import com.android.ray.veader.R;
+import org.ray.veader.R;
+
 
 import android.app.Activity;
 import android.app.Dialog;

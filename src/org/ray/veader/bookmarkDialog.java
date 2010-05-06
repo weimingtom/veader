@@ -3,11 +3,11 @@ package org.ray.veader;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
+import org.ray.veader.R;
 import org.ray.veader.LibraryList.bookmarkCursorAdapter;
 import org.ray.veader.provider.BookmarkColumn;
 import org.ray.veader.provider.CatalogColumn;
 
-import com.android.ray.veader.R;
 
 import android.app.Dialog;
 import android.app.ListActivity;

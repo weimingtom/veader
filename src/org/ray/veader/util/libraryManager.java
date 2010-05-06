@@ -1,8 +1,9 @@
 package org.ray.veader.util;
+import org.ray.veader.R;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import com.android.ray.veader.R;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
