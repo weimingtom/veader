@@ -4,6 +4,7 @@
 	<string name="btnhome">Bookself</string>
 
 <string name="title_chapter">Select Chapter</string>
+<string name="toast_bookmark">bookmark added</string>
 	<string name="booksfound">Book Found:</string>
 	<string name="btnaddlib">Add Library</string>
 	<string name="btnbookmark">bookmarks</string>

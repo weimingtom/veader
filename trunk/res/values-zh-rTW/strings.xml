@@ -25,6 +25,8 @@
 	  <string name="btnhome">書架</string>
 		  <string name="btnaddlib">添加目錄</string>
 		  <string name="btnbookmark">書纖</string>
+		  <string name="toast_bookmark">已加到書纖</string>
+		  	<string name="library_create">新增目錄</string>
 	<string name="app_name">Veader</string>
 	<string name="menu_text_size">字體大小</string>
 	<string name="default_charset">Default Charset</string>
@@ -44,6 +46,7 @@
 	<string name="menu_lib">書架</string>
 	<string name="menu_drop_all">全刪</string>
 		<string name="menu_next5">後五頁</string>
+		
 	<string name="menu_previous5">前五頁</string>
 	<string name="menu_nextchapter">下一節</string>
 	<string name="menu_previouschapter">前一節</string>
@@ -86,7 +89,7 @@
 	<string name="hint_text">Enter a name</string>
 	<string name="submitButton">Submit Name</string>
 	<string name="hello">Hello World</string>
-	<string name="library_create">Creating Library</string>
+
 	<string name="library_nobook">這個目錄沒有書檔</string>
 	<string name="library_cannotcreate">操作失敗，目錄已加進書架
 	</string>
