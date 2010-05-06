@@ -5,13 +5,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.android.ray.veader.R;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.ray.veader.R;
 import org.ray.veader.pdb.AbstractBookInfo;
 import org.ray.veader.provider.BookColumn;
 

@@ -29,11 +29,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ZoomControls;
 
-import com.android.ray.veader.R;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.ray.veader.R;
 import org.ray.veader.pdb.AbstractBookInfo;
 import org.ray.veader.provider.BookColumn;
 import org.ray.veader.util.ColorUtil;

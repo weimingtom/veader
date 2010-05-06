@@ -1,5 +1,6 @@
 package org.ray.veader;
 
+import org.ray.veader.R;
 import org.ray.veader.util.SDCardUtil;
 
 import android.app.Activity;
@@ -12,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.ImageView;
 
-import com.android.ray.veader.R;
 
 public class NoSDCardActivity extends Activity {
     private ImageView mIcon;

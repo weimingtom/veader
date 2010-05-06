@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.ray.veader.R;
 import org.ray.veader.SimpleGestureFilter.SimpleGestureListener;
 import org.ray.veader.provider.BookColumn;
 import org.ray.veader.provider.BookmarkColumn;
@@ -22,7 +23,6 @@ import org.ray.veader.util.libraryManager;
 //import com.android.lee.pdbreader.SoftwarePassionView.OrderAdapter;
 
 
-import com.android.ray.veader.R;
 
 
 //import com.totsp.androidexamples.MyApplication;

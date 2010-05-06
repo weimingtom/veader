@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
+import org.ray.veader.R;
 import org.ray.veader.SimpleGestureFilter.SimpleGestureListener;
 import org.ray.veader.pdb.AbstractBookInfo;
 import org.ray.veader.provider.BookColumn;
@@ -18,7 +19,6 @@ import org.ray.veader.provider.BookmarkColumn;
 import org.ray.veader.util.ColorUtil;
 import org.ray.veader.util.Constatnts;
 
-import com.android.ray.veader.R;
 
 
 import android.app.Activity;
