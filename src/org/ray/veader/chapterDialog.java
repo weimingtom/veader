@@ -157,6 +157,7 @@ ImageView viewIcon;
 				Log.d("BOOKID", String.valueOf(id));
 				intent.setClassName(chapterDialog.this, VeaderActivity.class
 						.getName());
+				this.finish();
 				startActivity(intent);
 			} 
 		}else {
