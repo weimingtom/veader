@@ -17,6 +17,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.zip.DataFormatException;
 import java.util.zip.InflaterInputStream;
 
@@ -50,7 +52,7 @@ Log.d("in set file", "");
         mName = new String(nameByte, mEncode).replace('_',' ').trim();
 
         mCount = channel.map(MapMode.READ_ONLY, 76, 2).asCharBuffer().get();
-        mCount = mCount -1;
+        //mCount = mCount -1;
 Log.d("mCount", String.valueOf(mCount));
         int offset = 78;
         mRecodeOffset = new int[mCount];
@@ -114,7 +116,11 @@ Log.d("mCount", String.valueOf(mCount));
 		str = cleantoc(str);
 		str = replaceString(str);
 		String[] _strlist = str.split("\n");
-		return _strlist;
+ArrayList al = new ArrayList(Arrays.asList(_strlist));
+al.remove(0);
+al.remove(0);
+
+		return  (String[]) al.toArray(new String [al.size ()]);
 
 	}
 	private String cleantoc(String str){
@@ -148,8 +154,8 @@ Log.d("mCount", String.valueOf(mCount));
             	startpos = startpos + _offset;
             	length = length -_offset;
             }
-            Log.d("startpos!!!", String.valueOf(startpos));
-            Log.d("length!!!", String.valueOf(length));
+            //Log.d("startpos!!!", String.valueOf(startpos));
+           // Log.d("length!!!", String.valueOf(length));
             bodyBuffer = channel.map(MapMode.READ_ONLY, startpos,
                     length).order(ByteOrder.BIG_ENDIAN);
             byte[] tmpCache = new byte[bodyBuffer.capacity()];
@@ -178,6 +184,7 @@ Log.d("mCount", String.valueOf(mCount));
                 str.charAt(1);
             }
         } else {
+        	Log.d("lastchapter", "lastchapter");
             bodyBuffer = ByteBuffer.wrap(new byte[8192]);
             int idx;
             while ((idx = channel.read(bodyBuffer)) > 0) {

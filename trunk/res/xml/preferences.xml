@@ -22,7 +22,7 @@
     android:dialogTitle="@string/pref_fontdialogTitle"
     android:defaultValue="16" />
 
-    <com.android.ray.widget.CustomPreference
+    <org.ray.widget.CustomPreference
             android:key="fontcolor"
             android:title="@string/title_fontcolor"
             android:summary="@string/pref_setfontcolor"
